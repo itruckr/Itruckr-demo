@@ -111,7 +111,7 @@ function AppContent() {
         relatedEntityType: loadProcessNotification.relatedEntityType,
         relatedEntityId: driver1.id,
       });
-    }, 15000);
+    }, 6000);
 
     // 3) Oil Change notification after 5 minutes from page load
     const oilChangeDefinition = NotificationDefinitions.creatOilChangeNotification({
