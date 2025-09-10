@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { MainContent } from '@/components/layout/MainContent';
 import { SideBar } from '@/components/layout/SideBar';
@@ -74,6 +74,8 @@ function AppContent() {
     updateDriver(driver1.id, { currentLoadId: null });
     updateDriver(driverRobert.id, { currentLoadId: loadRobert.id });
 
+    
+
     const preloadedCase = createCase({
       step: 2,
       notificationId: '2',
@@ -140,12 +142,12 @@ function AppContent() {
     };
   }, [isAuthenticated, addCompany, addTruck, addDriver, addLoad, updateDriver, addNotification, createCase, getProcessById, setProcessCurrentStep, addConversation]);
 
-  if (!isAuthenticated) {
-    const path = window.location.pathname;
+  const [page, setPage] = useState<"login" | "register">("login");
 
-    return (path === "/register") 
-    ? <RegisterPage />
-    : <LoginPage />;
+  if (!isAuthenticated) {
+    return page === "login" 
+    ? <LoginPage onGoRegister={ () => setPage("register") } />
+    : <RegisterPage onGoLogin={ () => setPage("login") } />;
   }
 
   return (

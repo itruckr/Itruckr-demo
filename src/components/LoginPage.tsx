@@ -7,7 +7,7 @@ import { ArrowRight, Bot, Eye, EyeOff, Shield, Truck } from 'lucide-react';
 import React, { useState } from 'react';
 import Logo from './Logo';
 
-const LoginPage: React.FC = () => {
+const LoginPage: React.FC<{ onGoRegister: () => void }> = ({ onGoRegister }) => {
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -115,10 +115,10 @@ const LoginPage: React.FC = () => {
               </Button>
             </form>
             <div className='flex items-endflex justify-end'>
-              <a href="/register"
+              <button onClick={ onGoRegister }
                 className="relative text-indigo-400 font-medium after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[2px] after:bg-indigo-400 after:transition-all hover:after:w-full">
                 Sign up
-              </a>
+              </button>
             </div>
           </CardContent>
         </Card>

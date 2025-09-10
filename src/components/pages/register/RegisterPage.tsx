@@ -7,7 +7,7 @@ import SignUpUploadDocuments from "./sign-up-upload-documents/SignUpUploadDocume
 import SignUpUploadDocumentsTruck from "./sign-up-upload-documents-truck/SignUpUploadDocumentsTruck";
 import SignUpConfirmationComponent from "./sign-up-confirmation/SignUpConfirmation";
 
-export default function RegisterPage() {
+const RegisterPage: React.FC<{ onGoLogin: () => void }> = ({ onGoLogin }) => {
   const [page, setPage] = useState(1);
 
   // Definimos los pasos en orden
@@ -28,6 +28,15 @@ export default function RegisterPage() {
         {/* Logo lateral */}
         <div className="hidden lg:block bg-pattern overflow-hidden">
           <Logo height={25} width={250} isComplete />
+        </div>
+
+        <div className="mt-2">
+          <button
+            onClick={onGoLogin}
+            className="text-white underline mb-4"
+          >
+            Back to Login
+          </button>
         </div>
 
         <div className="w-full bg-pattern flex flex-col items-center">
@@ -67,3 +76,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+export default RegisterPage;
