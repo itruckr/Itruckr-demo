@@ -29,6 +29,7 @@ import {
   TRUCK_ROBERT,
 } from './constants';
 import { NotificationDefinitions } from './notifications/notificationDefinitions';
+import RegisterPage from './components/pages/register/RegisterPage';
 
 function AppContent() {
   const { isAuthenticated } = useAuth();
@@ -140,7 +141,11 @@ function AppContent() {
   }, [isAuthenticated, addCompany, addTruck, addDriver, addLoad, updateDriver, addNotification, createCase, getProcessById, setProcessCurrentStep, addConversation]);
 
   if (!isAuthenticated) {
-    return <LoginPage />;
+    const path = window.location.pathname;
+
+    return (path === "/register") 
+    ? <RegisterPage />
+    : <LoginPage />;
   }
 
   return (

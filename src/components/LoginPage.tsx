@@ -114,6 +114,12 @@ const LoginPage: React.FC = () => {
                 )}
               </Button>
             </form>
+            <div className='flex items-endflex justify-end'>
+              <a href="/register"
+                className="relative text-indigo-400 font-medium after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[2px] after:bg-indigo-400 after:transition-all hover:after:w-full">
+                Sign up
+              </a>
+            </div>
           </CardContent>
         </Card>
 
