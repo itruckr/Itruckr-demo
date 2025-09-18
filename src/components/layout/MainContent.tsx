@@ -5,6 +5,7 @@ import { ITruckr } from '@/components/pages/ITruckr';
 import { Loads } from '@/components/pages/Loads';
 import { Payments } from '@/components/pages/Payments';
 import { Registration } from '@/components/pages/Registration';
+import { CallForm } from '@/components/pages/CallForm';
 import { useNavigation } from '@/contexts/NavigationContext';
 
 import { Loadboard } from '../pages/Loadboard';
@@ -30,6 +31,8 @@ export function MainContent() {
         return <Chat />;
       case 'email':
         return <Email />;
+      case 'call-form':
+        return <CallForm />;
       default:
         return <Dashboard />;
     }

@@ -555,3 +555,114 @@ export interface EmailFolder {
   icon: any; // Lucide icon component
   count: number;
 }
+
+export interface Dispatcher {
+    id:          string;
+    firstName:   string;
+    lastName:    string;
+    phoneNumber: string;
+    email:       string;
+    companies:   CompanyIdList[];
+    active:      boolean;
+}
+
+export interface CompanyIdList {
+    idCompany: string;
+}
+
+export interface Company {
+    id:          string;
+    companyName: string;
+    owner:       string;
+    phoneNumber: string;
+    email:       string;
+    brokers:     Broker[];
+    active:      boolean;
+}
+
+export interface Broker {
+    idBrokerCompany: number;
+    brokerId:        number;
+    companyId:       string;
+    brokerCode:      string;
+    brokerActive:    boolean;
+}
+
+export interface Driver {
+    id:                     string;
+    firstName:              string;
+    lastName:               string;
+    namePrefix:             string;
+    phoneNumber:            string;
+    email:                  string;
+    driverLicense:          string;
+    licenseExpiration:      Date;
+    medicalCard:            string;
+    medicalExpiration:      Date;
+    emergencyContactName:   string;
+    emergencyContactNumber: string;
+    active:                 boolean;
+    associations:           Association[];
+}
+
+export interface Association {
+    idDriverCompany: number;
+    companyId:       string;
+    paymentMethod:   PaymentMethod;
+    active:          boolean;
+}
+
+export interface Vehicule {
+    id:        number;
+    plate:     string;
+    vinNumber: string;
+    color:     string;
+    make:      string;
+    model:     string;
+    companyId: string;
+    active:    boolean;
+}
+
+export class Trailer {
+    id: number;
+    unit: string;
+    vinNumber: string;
+    rent: number;
+    active: boolean;
+}
+
+export interface ElevenLabsRequest {
+    to_number:                           string;
+    conversation_initiation_client_data: ConversationInitiationClientData;
+}
+
+export interface ConversationInitiationClientData {
+    dynamic_variables: DynamicVariables;
+}
+
+export interface DynamicVariables {
+    company_name:          string;
+    company_mc_number:     string;
+    origin:                string;
+    destination:           string;
+    BrokerName:            string;
+    weight:                string;
+    rate:                  string;
+    proposed_rate:         string;
+    final_rate:            string;
+    company_email:         string;
+    driver_name:           string;
+    dispatcher_phone:      string;
+    truck_number:          string;
+    trailer_number:        string;
+    load_reference:        string;
+    delivery_date:         string;
+    pickup_date:           string;
+    proposed_rate_minimum: string;
+    driver_phone:          string;
+    length:                string;
+    commodity:             string;
+    dispatcher_email:      string;
+    trailer_type:          string;
+    dispatcher_name:       string;
+}

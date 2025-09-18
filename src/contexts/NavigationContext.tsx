@@ -6,6 +6,7 @@ import {
   MessageCircle,
   Truck,
   Users,
+  FileSignatureIcon
 } from 'lucide-react';
 import React, { createContext, useContext, useState } from 'react';
 
@@ -17,7 +18,8 @@ type Page =
   | 'email'
   | 'loads'
   | 'payments'
-  | 'registration';
+  | 'registration'
+  | 'call-form';
 
 interface NavigationContextType {
   activePage: Page;
@@ -38,6 +40,7 @@ export const navItems = [
   { id: 'loads', label: 'Loads', icon: Truck },
   { id: 'loadboard', label: 'Loadboard', icon: MapPinned },
   { id: 'registration', label: 'Registration', icon: Users },
+  { id: 'call-form', label: 'Call Form', icon:  FileSignatureIcon},
 ] as const;
 
 export function NavigationProvider({

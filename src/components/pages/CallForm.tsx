@@ -1,0 +1,489 @@
+import clsx from "clsx";
+import { useForm } from "react-hook-form";
+import SucessFull from "../ui/animation/Sucessfull";
+import Headphone from "../ui/animation/Headphone";
+import { useEffect, useState } from "react";
+import { ErrorAnimated } from "../ui/animation/ErrorAnimated";
+import { obtainAccessToken, obtainCompany, obtainDispatcher, obtainDriver, obtainTrailer, obtainVehicle, outBoundCall } from "@/api";
+import { Company, Dispatcher, Driver, Vehicule, Trailer } from '@/types/app';
+import { LoadingScreen } from "../ui/animation/loadingScreen";
+
+
+type FormInputs = {
+  origin: string;
+  destination: string;
+  broker_name: string;
+  weight: number;
+  rate: string;
+  length: string;
+  commodity: string;
+  delivery_date: string;
+  pickup_date: string;
+  load_reference: string;
+  to_number: string;
+  trailer_type: string;
+
+  // business
+  proposed_rate: string,
+  proposed_rate_minimum: string,
+  final_rate: string,
+
+  // truck
+  vehicle: string;
+  trailer: string;
+  driver: string;
+  company: string;
+  company_mc_number: string;
+  dispatcher: string;
+}
+
+export const CallForm = () => {
+
+  const [loading, setLoading] = useState<'create' | 'loading' | 'loading_call' | 'success' | 'error'>('loading');
+  const [dispatchers, setDisparchers] = useState<Dispatcher[]>([]);
+  const [Companies, setCompanies] = useState<Company[]>([]);
+  const [Drivers, setDrivers] = useState<Driver[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicule[]>([]);
+  const [trailers, setTrailers] = useState<Trailer[]>([]);
+  const { handleSubmit, register, formState: { isValid }, watch, reset, setValue } = useForm<FormInputs>({
+        defaultValues: {
+            
+        }
+    });
+  
+  const getAccessToken = async () => {
+    const result = await obtainAccessToken('briana', 'briana');
+    
+    if (!result) {
+      setLoading('error');
+    }
+
+    return result.access_token
+  }
+
+  const allDispatcher = async (accessToken: string): Promise<Dispatcher[]> => {
+    const result = await obtainDispatcher(accessToken);
+    return result
+  }
+
+  const allCompany = async (accessToken: string): Promise<Company[]> => {
+    const result = await obtainCompany(accessToken);
+    return result
+  }
+
+  const allDriver = async (accessToken: string): Promise<Driver[]> => {
+    const result = await obtainDriver(accessToken);
+    return result
+  }
+
+  const allVehicle = async (accessToken: string): Promise<Vehicule[]> => {
+    const result = await obtainVehicle(accessToken);
+    return result
+  }
+
+  const allTrailer = async (accessToken: string): Promise<Trailer[]> => {
+    const result = await obtainTrailer(accessToken);
+    return result
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      
+      const cachedData = localStorage.getItem('appDataCache');
+
+      if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+        setDisparchers(parsedData.dispatchers);
+        setCompanies(parsedData.companies);
+        setDrivers(parsedData.drivers);
+        setVehicles(parsedData.vehicles);
+        setTrailers(parsedData.trailers);
+        setLoading('create');
+        return;
+      }
+
+      setLoading('loading');
+      try {
+        const accessToken = await getAccessToken();
+        if (!accessToken) throw new Error('Token vacío');
+
+        const [dispatchers, companies, drivers, vehicles, trailers] = await Promise.all([
+          allDispatcher(accessToken),
+          allCompany(accessToken),
+          allDriver(accessToken),
+          allVehicle(accessToken),
+          allTrailer(accessToken)
+        ]);
+
+        const filteredData = {
+          dispatchers: dispatchers.filter(element => element.active),
+          companies: companies.filter(element => element.active),
+          drivers: drivers.filter(element => element.active),
+          vehicles: vehicles.filter(element => element.active),
+          trailers: trailers.filter(element => element.active)
+        };
+
+        setDisparchers(filteredData.dispatchers);
+        setCompanies(filteredData.companies);
+        setDrivers(filteredData.drivers);
+        setVehicles(filteredData.vehicles);
+        setTrailers(filteredData.trailers);
+        setLoading('create');
+        
+        localStorage.setItem('appDataCache', JSON.stringify(filteredData));
+      } catch (error: any) {
+        console.error(error?.message ?? 'Error al procesar consultas');
+        setLoading('error');
+      }
+    };
+
+    fetchData();
+  }, []);
+  
+  const onSubmit = async ( data: FormInputs ) => {
+    setLoading('loading_call');
+
+    const company = Companies.find((element) => element.id === data.company);
+    const driver = Drivers.find((element) => element.id === data.driver);
+    const dispatcher = dispatchers.find((element) => element.id === data.dispatcher);
+    const vehicle = vehicles.find((element) => element.id === Number(data.vehicle));
+    const trailer = trailers.find((element) => element.id === Number(data.trailer));
+
+    const elevenLabsRequest = {
+      to_number: data.to_number,
+      conversation_initiation_client_data:{
+        dynamic_variables: {
+          company_name:          company?.companyName ?? '',
+          company_mc_number:     data.company_mc_number,
+          origin:                data.origin,
+          destination:           data.destination,
+          BrokerName:            data.broker_name,
+          weight:                String(data.weight),
+          rate:                  data.rate,
+          proposed_rate:         data.proposed_rate,
+          final_rate:            data.final_rate,
+          company_email:         company?.email ?? '',
+          driver_name:           `${ driver?.firstName } ${ driver?.lastName }`,
+          dispatcher_phone:      dispatcher?.phoneNumber ?? '',
+          truck_number:          String(vehicle?.id),
+          trailer_number:        trailer?.unit ?? '',
+          load_reference:        data.load_reference,
+          delivery_date:         data.delivery_date,
+          pickup_date:           data.pickup_date,
+          proposed_rate_minimum: data.proposed_rate_minimum,
+          driver_phone:          driver?.phone ?? '',
+          length:                data.length,
+          commodity:             data.commodity,
+          dispatcher_email:      dispatcher?.email ?? '',
+          trailer_type:          data.trailer_type,
+          dispatcher_name:       `${dispatcher?.firstName} ${dispatcher?.lastName}`,
+        }
+      }
+    }
+
+    const result = await outBoundCall(elevenLabsRequest);
+
+    //callSid: "CA527ec5fe21a4c0dfcdda62d493a42d10"
+    //conversation_id: "conv_4101k5fe8kcpekr81r7a3t9xsjwc"
+    //message: "b'Success'"
+    //success: true
+    //await new Promise((resolve) => setTimeout(resolve, 5000));
+    //setLoading('success');
+    //await new Promise((resolve) => setTimeout(resolve, 5000));
+    //setLoading('error');
+  } 
+
+
+  return (
+    <>
+      {
+        loading === "create" && (
+          <form onSubmit={ handleSubmit( onSubmit ) } className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2">
+
+            <div className="flex flex-col mb-2">
+              <span>Telefono Broker</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  autoFocus
+                  { ...register('to_number', { required: true }) }
+              />
+            </div>
+      
+            <div className="flex flex-col mb-2">
+              <span>Dispatcher</span>
+              <select
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('dispatcher', { required: true }) }
+              >
+                <option value="">[ Seleccione ]</option>
+                
+                {
+                  dispatchers.map((dispacht) => (
+                    <option key={ dispacht.id } value={ dispacht.id }>{ dispacht.firstName } {dispacht.lastName}</option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Company</span>
+              <select
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('company', { required: true }) }
+              >
+                  <option value="">[ Seleccione ]</option>
+                  
+                  {
+                    Companies.map((company) => (
+                      <option key={ company.id } value={ company.id }>{ company.companyName }</option>
+                    ))
+                  }
+              </select>
+            </div>
+            
+
+            <div className="flex flex-col mb-2">
+              <span>company mc number</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('company_mc_number', { required: true }) }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Driver</span>
+              <select
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('driver', { required: true }) }
+              >
+                <option value="">[ Seleccione ]</option>
+                
+                {
+                  Drivers.map((drvier) => (
+                    <option key={ drvier.id } value={ drvier.id }>{ drvier.firstName } { drvier.lastName }</option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Vehicle</span>
+              <select
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('vehicle', { required: true }) }
+              >
+                  <option value="">[ Seleccione ]</option>
+                  {
+                    vehicles.map((vehicle) => (
+                      <option key={ vehicle.id } value={ vehicle.id }>{ vehicle.id }</option>
+                    ))
+                  }
+              </select>
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Trailer</span>
+              <select
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('trailer', { required: true }) }
+              >
+                  <option value="">[ Seleccione ]</option>
+                  {
+                    trailers.map((trailer) => (
+                      <option key={ trailer.id } value={ trailer.id }>{ trailer.unit }</option>
+                    ))
+                  }
+              </select>
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Tipo de Trailer</span>
+              <select
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('trailer_type', { required: true }) }
+              >
+                  <option value="">[ Seleccione ]</option>
+                  <option value="Dry van">Dry van</option>
+                  <option value="Reefer">Reefer</option>
+                  <option value="Flatbed">Flatbed</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Origin</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('origin', { required: true }) }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Destination</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('destination', { required: true }) }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Broker Name</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('broker_name', { required: true }) }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Weight</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('weight', { required: true }) }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Rate</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('rate', { required: true }) }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Length</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('length') }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Commodity</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('commodity') }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Pickup Date</span>
+              <input
+                  type="date"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('pickup_date') }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Delivery Date</span>
+              <input
+                  type="date"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('delivery_date') }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>Load Reference</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('load_reference') }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              <span>propuesta rate</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('proposed_rate') }
+              />
+            </div>
+
+
+            <div className="flex flex-col mb-2">
+              <span>propuesta rate min</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('proposed_rate_minimum') }
+              />
+            </div>
+
+
+            <div className="flex flex-col mb-2">
+              <span>Valor final</span>
+              <input
+                  type="text"
+                  className="p-2 border rounded-md bg-gray-200"
+                  { ...register('final_rate') }
+              />
+            </div>
+
+            <div className="flex flex-col mb-2">
+              
+            </div>
+
+            <div className="flex flex-col mb-2 sm:mt-2">
+              <div className="flex flex-auto">
+                <button
+                    disabled={ !isValid }
+                    type='submit'
+                    className={
+                        clsx(
+                            "flex w-full sm:w-1/2 justify-center ",
+                            {
+                                'btn-primary': isValid,
+                                'btn-disabled': !isValid
+                            }
+                        )
+                    }>
+                    Submit
+                </button>
+              </div>
+            </div>
+
+          </form>
+        )
+      }
+
+      <div>
+        {loading === "success" && (
+          <div className="grid place-items-center h-full">
+            <SucessFull />
+          </div>
+          
+        )}
+        {loading === "loading_call" && (
+          <div className="grid place-items-center h-full">
+            <Headphone />
+          </div>
+          
+        )}
+        {loading === "loading" && (
+          <div className="grid place-items-center h-full">
+            <LoadingScreen />
+          </div>
+          
+        )}
+        {loading === "error" && (
+          <div className="grid place-items-center h-full">
+            <ErrorAnimated />
+          </div>
+        )}
+      </div>
+
+      
+    </>
+  )
+}

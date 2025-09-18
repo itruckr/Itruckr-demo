@@ -3,3 +3,15 @@
   margin: 0 auto;
   text-align: center;
 }
+
+.btn-primary {
+  @apply bg-blue-800 hover:bg-blue-600 active:bg-blue-600 text-white py-2 px-4 rounded transition-all cursor-pointer;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-black py-2 px-4 rounded transition-all cursor-pointer;
+}
+
+.btn-disabled {
+  @apply bg-gray-600 text-white py-2 px-4 rounded transition-all;
+}
