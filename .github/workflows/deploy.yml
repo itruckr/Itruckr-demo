@@ -38,6 +38,26 @@ jobs:
         
       - name: Build
         run: npm run build
+        env:
+          VITE_CLIENT_ID: ${{ vars.VITE_CLIENT_ID }}
+          VITE_REALMS: ${{ vars.VITE_REALMS }}
+          VITE_SSO_URL: ${{ vars.VITE_SSO_URL }}
+          VITE_CLIENT_ID_ADMIN: ${{ vars.VITE_CLIENT_ID_ADMIN }}
+          VITE_REALMS_ADMIN: ${{ vars.VITE_REALMS_ADMIN }}
+          VITE_USER_ADMIN: ${{ vars.VITE_USER_ADMIN }}
+          VITE_PASSWORD_ADMIN: ${{ vars.VITE_PASSWORD_ADMIN }}
+          VITE_LOAD_SVC: ${{ vars.VITE_LOAD_SVC }}
+          VITE_LOAD_SEARCH: ${{ vars.VITE_LOAD_SEARCH }}
+          VITE_LOAD_PROCESSOR: ${{ vars.VITE_LOAD_PROCESSOR }}
+          VITE_FILE_SVC: ${{ vars.VITE_FILE_SVC }}
+          VITE_REGISTRATION_SVC: ${{ vars.VITE_REGISTRATION_SVC }}
+          VITE_PAYMENT_SVC: ${{ vars.VITE_PAYMENT_SVC }}
+          VITE_ALERT_SVC: ${{ vars.VITE_ALERT_SVC }}
+          VITE_CHAT_SVC: ${{ vars.VITE_CHAT_SVC }}
+          VITE_EXTERNAL_SVC: ${{ vars.VITE_EXTERNAL_SVC }}
+          VITE_WEB_SOCKET_SVC: ${{ vars.VITE_WEB_SOCKET_SVC }}
+          VITE_BUCKET_CHAT: ${{ vars.VITE_BUCKET_CHAT }}
+          VITE_BUCKET_LOAD_FILE: ${{ vars.VITE_BUCKET_LOAD_FILE }}
         
       - name: Setup Pages
         uses: actions/configure-pages@v4
