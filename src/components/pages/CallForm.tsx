@@ -4,8 +4,8 @@ import SucessFull from "../ui/animation/Sucessfull";
 import Headphone from "../ui/animation/Headphone";
 import { useEffect, useState } from "react";
 import { ErrorAnimated } from "../ui/animation/ErrorAnimated";
-import { obtainCompany, obtainDispatcher, obtainDriver, obtainTrailer, obtainVehicle, outBoundCall } from "@/api";
-import { CompanyForm as Company, Dispatcher, Driver, Vehicule, Trailer } from '@/types/app';
+import { obtainDispatcher, obtainDriver, obtainTrailer, obtainVehicle, outBoundCall } from "@/api";
+import { Dispatcher, Driver, Vehicule, Trailer } from '@/types/app';
 import { LoadingScreen } from "../ui/animation/loadingScreen";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 
@@ -33,23 +33,48 @@ type FormInputs = {
   trailer: string;
   driver: string;
   company: string;
-  company_mc_number: string;
   dispatcher: string;
 }
 
 type LoadingState = "create" | "loading" | "loading_call" | "success" | "error" | "info";
+
+const authorities = [
+  {
+    id: 1,
+    name: 'ITR',
+    email: 'info.itrapp@gmail.com	',
+    mcNumber: '1582744'
+  },
+  {
+    id: 2,
+    name: 'VIZU LOGISTICS SOLUTIONS	',
+    email: 'vizulogisticssolutions@gmail.com',
+    mcNumber: '1130788'
+  },
+  {
+    id: 3,
+    name: 'MOLA S TRANSPORT',
+    email: 'molastransport@gmail.com',
+    mcNumber: '125039'
+  },
+  {
+    id: 4,
+    name: 'TECH TRUCK INC',
+    email: 'techtruck49gmail.com',
+    mcNumber: '1713895'
+  }
+]
 
 export const CallForm = () => {
 
   const { messages } = useWebSocket();
   const [loading, setLoading] = useState<LoadingState>('loading');
   const [dispatchers, setDisparchers] = useState<Dispatcher[]>([]);
-  const [Companies, setCompanies] = useState<Company[]>([]);
   const [Drivers, setDrivers] = useState<Driver[]>([]);
   const [vehicles, setVehicles] = useState<Vehicule[]>([]);
   const [trailers, setTrailers] = useState<Trailer[]>([]);
   const [lastData, setLastData] = useState<any | null>(null);
-  const { handleSubmit, register, formState: { isValid } } = useForm<FormInputs>({
+  const { handleSubmit, register, formState: { isValid }, reset } = useForm<FormInputs>({
         defaultValues: {
             
         }
@@ -57,11 +82,6 @@ export const CallForm = () => {
 
   const allDispatcher = async (accessToken: string): Promise<Dispatcher[]> => {
     const result = await obtainDispatcher(accessToken);
-    return result
-  }
-
-  const allCompany = async (accessToken: string): Promise<Company[]> => {
-    const result = await obtainCompany(accessToken);
     return result
   }
 
@@ -88,7 +108,6 @@ export const CallForm = () => {
       if (cachedData) {
         const parsedData = JSON.parse(cachedData);
         setDisparchers(parsedData.dispatchers);
-        setCompanies(parsedData.companies);
         setDrivers(parsedData.drivers);
         setVehicles(parsedData.vehicles);
         setTrailers(parsedData.trailers);
@@ -101,9 +120,8 @@ export const CallForm = () => {
         const accessToken = localStorage.getItem("auth_token");
         if (!accessToken) throw new Error('Token vacío');
 
-        const [dispatchers, companies, drivers, vehicles, trailers] = await Promise.all([
+        const [dispatchers, drivers, vehicles, trailers] = await Promise.all([
           allDispatcher(accessToken),
-          allCompany(accessToken),
           allDriver(accessToken),
           allVehicle(accessToken),
           allTrailer(accessToken)
@@ -111,14 +129,12 @@ export const CallForm = () => {
 
         const filteredData = {
           dispatchers: dispatchers.filter(element => element.active),
-          companies: companies.filter(element => element.active),
           drivers: drivers.filter(element => element.active),
           vehicles: vehicles.filter(element => element.active),
           trailers: trailers.filter(element => element.active)
         };
 
         setDisparchers(filteredData.dispatchers);
-        setCompanies(filteredData.companies);
         setDrivers(filteredData.drivers);
         setVehicles(filteredData.vehicles);
         setTrailers(filteredData.trailers);
@@ -157,7 +173,7 @@ export const CallForm = () => {
   const onSubmit = async ( data: FormInputs ) => {
     setLoading('loading_call');
 
-    const company = Companies.find((element) => element.id === data.company);
+    const company = authorities.find((element) => element.id === Number(data.company));
     const driver = Drivers.find((element) => element.id === data.driver);
     const dispatcher = dispatchers.find((element) => element.id === data.dispatcher);
     const vehicle = vehicles.find((element) => element.id === Number(data.vehicle));
@@ -167,8 +183,8 @@ export const CallForm = () => {
       to_number: data.to_number,
       conversation_initiation_client_data:{
         dynamic_variables: {
-          company_name:          company?.companyName ?? '',
-          company_mc_number:     data.company_mc_number,
+          company_name:          company?.name ?? '',
+          company_mc_number:     company?.mcNumber ?? '',
           origin:                data.origin,
           destination:           data.destination,
           BrokerName:            data.broker_name,
@@ -195,10 +211,16 @@ export const CallForm = () => {
       }
     }
 
-    await outBoundCall(elevenLabsRequest);
+    try {
+      await outBoundCall(elevenLabsRequest);  
+    } catch (error) {
+      setLoading('error')
+    }
+    
   }
 
   const resetForm = () => {
+    reset();
     setLoading('create');
     setLastData(null);
   }
@@ -245,21 +267,11 @@ export const CallForm = () => {
                   <option value="">[ Seleccione ]</option>
                   
                   {
-                    Companies.map((company) => (
-                      <option key={ company.id } value={ company.id }>{ company.companyName }</option>
+                    authorities.map((company) => (
+                      <option key={ company.id } value={ company.id }>{ company.name }</option>
                     ))
                   }
               </select>
-            </div>
-            
-
-            <div className="flex flex-col mb-2">
-              <span>company mc number</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('company_mc_number', { required: true }) }
-              />
             </div>
 
             <div className="flex flex-col mb-2">
@@ -440,10 +452,6 @@ export const CallForm = () => {
               />
             </div>
 
-            <div className="flex flex-col mb-2">
-              
-            </div>
-
             <div className="flex flex-col mb-2 sm:mt-2">
               <div className="flex flex-auto">
                 <button
@@ -489,6 +497,10 @@ export const CallForm = () => {
         {loading === "error" && (
           <div className="grid place-items-center h-full">
             <ErrorAnimated />
+
+            <div>
+              <button onClick={ resetForm } className="btn-primary">New call</button>
+            </div>
           </div>
         )}
       </div>

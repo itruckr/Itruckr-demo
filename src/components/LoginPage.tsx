@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ArrowRight, Bot, Eye, EyeOff, Shield, Truck } from 'lucide-react';
 import React, { useState } from 'react';
 import Logo from './Logo';
-//import { obtainAccessToken } from '@/api';
+import { obtainAccessToken } from '@/api';
 
 const LoginPage: React.FC<{ onGoRegister: () => void }> = ({ onGoRegister }) => {
   const { login } = useAuth();
@@ -16,11 +16,11 @@ const LoginPage: React.FC<{ onGoRegister: () => void }> = ({ onGoRegister }) => 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  //const getAccessToken = async () => {
-  //  const result = await obtainAccessToken('briana', 'briana');
-  //
-  //  return result.access_token
-  //}
+  const getAccessToken = async () => {
+    const result = await obtainAccessToken('barango', 'b@rang0#');
+  
+    return result.access_token
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,8 +30,8 @@ const LoginPage: React.FC<{ onGoRegister: () => void }> = ({ onGoRegister }) => 
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    //const result = await getAccessToken();
-    //localStorage.setItem('auth_token', result);
+    const result = await getAccessToken();
+    localStorage.setItem('auth_token', result);
 
     const loginSuccess = login(username, password);
 
