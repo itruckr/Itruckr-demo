@@ -4,10 +4,10 @@ import SucessFull from "../ui/animation/Sucessfull";
 import Headphone from "../ui/animation/Headphone";
 import { useEffect, useState } from "react";
 import { ErrorAnimated } from "../ui/animation/ErrorAnimated";
-import { obtainAccessToken, obtainCompany, obtainDispatcher, obtainDriver, obtainTrailer, obtainVehicle, outBoundCall } from "@/api";
-import { Company, Dispatcher, Driver, Vehicule, Trailer } from '@/types/app';
+import { obtainCompany, obtainDispatcher, obtainDriver, obtainTrailer, obtainVehicle, outBoundCall } from "@/api";
+import { CompanyForm as Company, Dispatcher, Driver, Vehicule, Trailer } from '@/types/app';
 import { LoadingScreen } from "../ui/animation/loadingScreen";
-
+import { useWebSocket } from "@/contexts/WebSocketContext";
 
 type FormInputs = {
   origin: string;
@@ -37,29 +37,23 @@ type FormInputs = {
   dispatcher: string;
 }
 
+type LoadingState = "create" | "loading" | "loading_call" | "success" | "error" | "info";
+
 export const CallForm = () => {
 
-  const [loading, setLoading] = useState<'create' | 'loading' | 'loading_call' | 'success' | 'error'>('loading');
+  const { messages } = useWebSocket();
+  const [loading, setLoading] = useState<LoadingState>('loading');
   const [dispatchers, setDisparchers] = useState<Dispatcher[]>([]);
   const [Companies, setCompanies] = useState<Company[]>([]);
   const [Drivers, setDrivers] = useState<Driver[]>([]);
   const [vehicles, setVehicles] = useState<Vehicule[]>([]);
   const [trailers, setTrailers] = useState<Trailer[]>([]);
-  const { handleSubmit, register, formState: { isValid }, watch, reset, setValue } = useForm<FormInputs>({
+  const [lastData, setLastData] = useState<any | null>(null);
+  const { handleSubmit, register, formState: { isValid } } = useForm<FormInputs>({
         defaultValues: {
             
         }
     });
-  
-  const getAccessToken = async () => {
-    const result = await obtainAccessToken('briana', 'briana');
-    
-    if (!result) {
-      setLoading('error');
-    }
-
-    return result.access_token
-  }
 
   const allDispatcher = async (accessToken: string): Promise<Dispatcher[]> => {
     const result = await obtainDispatcher(accessToken);
@@ -104,7 +98,7 @@ export const CallForm = () => {
 
       setLoading('loading');
       try {
-        const accessToken = await getAccessToken();
+        const accessToken = localStorage.getItem("auth_token");
         if (!accessToken) throw new Error('Token vacío');
 
         const [dispatchers, companies, drivers, vehicles, trailers] = await Promise.all([
@@ -139,6 +133,26 @@ export const CallForm = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      
+      if (lastMessage.type === "post-call-webhook") {
+        if (lastMessage.status === "Successful") {
+          setLoading("success");
+        } else {
+          setLoading("error");
+        }
+
+        // después de 2 segundos mostramos el resto
+        setTimeout(() => {
+          setLastData(lastMessage);
+          setLoading('info');
+        }, 2000);
+      }
+    }
+  }, [messages]);
   
   const onSubmit = async ( data: FormInputs ) => {
     setLoading('loading_call');
@@ -181,17 +195,13 @@ export const CallForm = () => {
       }
     }
 
-    const result = await outBoundCall(elevenLabsRequest);
+    await outBoundCall(elevenLabsRequest);
+  }
 
-    //callSid: "CA527ec5fe21a4c0dfcdda62d493a42d10"
-    //conversation_id: "conv_4101k5fe8kcpekr81r7a3t9xsjwc"
-    //message: "b'Success'"
-    //success: true
-    //await new Promise((resolve) => setTimeout(resolve, 5000));
-    //setLoading('success');
-    //await new Promise((resolve) => setTimeout(resolve, 5000));
-    //setLoading('error');
-  } 
+  const resetForm = () => {
+    setLoading('create');
+    setLastData(null);
+  }
 
 
   return (
@@ -482,6 +492,42 @@ export const CallForm = () => {
           </div>
         )}
       </div>
+
+      {
+        loading === 'info' && (
+          <div className="p-4 border rounded-md shadow-sm">
+            <h2 className="font-bold text-lg mb-2">Estado de la llamada</h2>
+
+            {lastData && (
+              <>
+                <div className="mt-4 space-y-2">
+                  <p>
+                    <strong>Agent ID:</strong> {lastData.agentId}
+                  </p>
+                  <p>
+                    <strong>Conversation ID:</strong> {lastData.conversation_id}
+                  </p>
+                  <p>
+                    <strong>User ID:</strong> {lastData.userId}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {lastData.status}
+                  </p>
+                  <p>
+                    <strong>Transcript:</strong>
+                  </p>
+                  <pre className="bg-gray-100 p-2 text-left rounded text-sm whitespace-pre-wrap">
+                    {lastData.transcript}
+                  </pre>
+                </div>
+                <div>
+                  <button onClick={ resetForm } className="btn-primary">New call</button>
+                </div>
+              </>
+            )}
+          </div>
+        )
+      }
 
       
     </>

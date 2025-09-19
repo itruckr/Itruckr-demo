@@ -570,7 +570,7 @@ export interface CompanyIdList {
     idCompany: string;
 }
 
-export interface Company {
+export interface CompanyForm {
     id:          string;
     companyName: string;
     owner:       string;

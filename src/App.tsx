@@ -30,6 +30,7 @@ import {
 } from './constants';
 import { NotificationDefinitions } from './notifications/notificationDefinitions';
 import RegisterPage from './components/pages/register/RegisterPage';
+import { WebSocketProvider } from './contexts/WebSocketContext';
 
 function AppContent() {
   const { isAuthenticated } = useAuth();
@@ -156,7 +157,9 @@ function AppContent() {
         <div className='h-screen p-3 rounded-sm overflow-hidden bg-custom-background grid grid-cols-1 lg:grid-rows-[auto_1fr] lg:grid-cols-[auto_1fr]'>
           <SideBar />
           <TitleBar />
-          <MainContent />
+          <WebSocketProvider>
+            <MainContent />
+          </WebSocketProvider>
           <Toaster />
         </div>
       </TooltipProvider>
