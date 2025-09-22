@@ -41,7 +41,7 @@ type LoadingState = "create" | "loading" | "loading_call" | "success" | "error" 
 const authorities = [
   {
     id: 1,
-    name: 'ITR',
+    name: 'ITR APP',
     email: 'info.itrapp@gmail.com	',
     mcNumber: '1582744'
   },
@@ -204,7 +204,7 @@ export const CallForm = () => {
           driver_phone:          driver?.phone ?? '',
           length:                data.length,
           commodity:             data.commodity,
-          dispatcher_email:      dispatcher?.email ?? '',
+          dispatcher_email:      company?.email ?? '',
           trailer_type:          data.trailer_type,
           dispatcher_name:       `${dispatcher?.firstName} ${dispatcher?.lastName}`,
         }
@@ -370,7 +370,7 @@ export const CallForm = () => {
             </div>
 
             <div className="flex flex-col mb-2">
-              <span>Rate</span>
+              <span>Posted rate</span>
               <input
                   type="text"
                   className="p-2 border rounded-md bg-gray-200"
@@ -424,7 +424,7 @@ export const CallForm = () => {
             </div>
 
             <div className="flex flex-col mb-2">
-              <span>propuesta rate</span>
+              <span>Expected rate</span>
               <input
                   type="text"
                   className="p-2 border rounded-md bg-gray-200"
@@ -434,7 +434,7 @@ export const CallForm = () => {
 
 
             <div className="flex flex-col mb-2">
-              <span>propuesta rate min</span>
+              <span>Minimum rate</span>
               <input
                   type="text"
                   className="p-2 border rounded-md bg-gray-200"
