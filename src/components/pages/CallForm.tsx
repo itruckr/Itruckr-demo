@@ -26,7 +26,7 @@ type FormInputs = {
   // business
   proposed_rate: string,
   proposed_rate_minimum: string,
-  final_rate: string,
+  //final_rate: string,
 
   // truck
   vehicle: string;
@@ -191,7 +191,7 @@ export const CallForm = () => {
           weight:                String(data.weight),
           rate:                  data.rate,
           proposed_rate:         data.proposed_rate,
-          final_rate:            data.final_rate,
+          final_rate:            '',
           company_email:         company?.email ?? '',
           driver_name:           `${ driver?.firstName } ${ driver?.lastName }`,
           dispatcher_phone:      dispatcher?.phoneNumber ?? '',
@@ -444,12 +444,6 @@ export const CallForm = () => {
 
 
             <div className="flex flex-col mb-2">
-              <span>Valor final</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('final_rate') }
-              />
             </div>
 
             <div className="flex flex-col mb-2 sm:mt-2">
