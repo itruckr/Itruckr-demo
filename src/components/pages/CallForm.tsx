@@ -225,7 +225,7 @@ export const CallForm = () => {
   }
 
   const resetForm = () => {
-    //reset();
+    reset();
     setLoading('create');
     setLastData(null);
     setAudioUrl(null);
