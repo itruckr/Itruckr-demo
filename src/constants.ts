@@ -73,14 +73,14 @@ Here are the details of booked load:
 ### ⬆️ Pickup Details
 | Parameter | Value |
 |---|---|
-| **Pickup Date** | 09/19/2025 |
+| **Pickup Date** | 09/25/2025 |
 | **Pickup Window** | 08:00 - 15:00 |
 | **Address** | Baltimore, MD, 21222 |
 
 ### ⬇️ Delivery Details
 | Parameter | Value |
 |---|---|
-| **Delivery Date** | 09/22/2025 |
+| **Delivery Date** | 09/27/2025 |
 | **Delivery Window** | 08:00 - 15:00 |
 | **Address** | Montgomery, IL, 60538 |`,
 } as ChatMessage;
@@ -102,13 +102,13 @@ You’ve been assigned a new load. Please review the details below
 **⬆️ Pickup Details**
 * **Contact:** RTW LOGISTICS INC
 * **Address:** 8203 Fischer Road, BALTIMORE, MD, 21222
-* **Date:** 09/19/2025 08:00
+* **Date:** 09/25/2025 08:00
 * **Pickup Window:** 8:00 - 15:00
 
 **⬇️ Delivery Details**
 * **Name:** Tsa Processing - Montgomery
 * **Address:** 325 S Route 31, Suite G103 Building G, MONTGOMERY, IL, 60538
-* **Delivery Date:** 09/22/2025 15:00
+* **Delivery Date:** 09/27/2025 15:00
 * **Delivery Window:** 08:00 - 15:00
 
 **📋 Aditional Information**
@@ -229,9 +229,9 @@ Quantity: 3
 
 Facility: RTW LOGISTICS INC
 
-Earliest: 09/19/2025 08:00
+Earliest: 09/25/2025 08:00
 
-Latest: 09/19/2025 15:00
+Latest: 09/25/2025 15:00
 
 Origin: 8203 Fischer Road, Baltimore, Maryland, 21222
 

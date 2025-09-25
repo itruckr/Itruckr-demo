@@ -984,7 +984,7 @@ export default {
       "weightLbs": 26693,
       "cargoDescription": "Agricultural produce",
       "createdDate": "2025-06-07T11:32:22.123Z",
-      "updatedDate": "2025-07-16T20:28:44.366Z"
+      "updatedDate": "2025-09-26T20:28:44.366Z"
     },
     {
       "id": "c3svwnj3zqj2a7ow6s828j",
@@ -1011,7 +1011,7 @@ export default {
           "longitude": -103.037414
         }
       },
-      "pickUpDate": "2025-07-16T06:13:25.379Z",
+      "pickUpDate": "2025-09-26T06:13:25.379Z",
       "deliveryDate": "2025-07-22T08:58:34.652Z",
       "actualPickupDate": "2025-07-15T12:27:17.700Z",
       "actualDeliveryDate": "2025-07-22T05:17:23.539Z",
@@ -1028,7 +1028,7 @@ export default {
       "cargoDescription": "Packaged foods",
       "specialInstructions": "Further details will follow shortly.",
       "createdDate": "2025-03-27T02:41:09.010Z",
-      "updatedDate": "2025-07-17T17:07:21.251Z"
+      "updatedDate": "2025-09-25T17:07:21.251Z"
     },
     {
       "id": "vnwb4ogwo5dg1w8k9x1cle",
@@ -1420,7 +1420,7 @@ export default {
       "weightLbs": 23626,
       "cargoDescription": "Textile goods",
       "createdDate": "2025-06-13T15:04:55.980Z",
-      "updatedDate": "2025-07-17T04:49:31.571Z"
+      "updatedDate": "2025-09-25T04:49:31.571Z"
     },
     {
       "id": "8znsbe0chp9dhzdr111f6g",
@@ -1593,7 +1593,7 @@ export default {
       "weightLbs": 18249,
       "cargoDescription": "Agricultural produce",
       "createdDate": "2025-07-12T11:36:17.956Z",
-      "updatedDate": "2025-07-17T10:50:12.903Z"
+      "updatedDate": "2025-09-25T10:50:12.903Z"
     },
     {
       "id": "uu61x61xezrzl2cgfy48b9",
@@ -1708,9 +1708,9 @@ export default {
         }
       },
       "pickUpDate": "2025-07-12T13:04:28.072Z",
-      "deliveryDate": "2025-07-17T10:54:03.429Z",
+      "deliveryDate": "2025-09-25T10:54:03.429Z",
       "actualPickupDate": "2025-07-12T04:43:53.207Z",
-      "actualDeliveryDate": "2025-07-17T03:38:18.032Z",
+      "actualDeliveryDate": "2025-09-25T03:38:18.032Z",
       "carrierCompanyId": "34qejaho98pxcon8k9c0rg",
       "brokerCompanyId": "z72amqlg27m5bnpwr8ehc",
       "factoring": false,
@@ -1793,10 +1793,10 @@ export default {
           "longitude": -85.284053
         }
       },
-      "pickUpDate": "2025-07-17T16:23:03.346Z",
+      "pickUpDate": "2025-09-25T16:23:03.346Z",
       "deliveryDate": "2025-07-18T02:29:11.221Z",
-      "actualPickupDate": "2025-07-17T10:48:21.468Z",
-      "actualDeliveryDate": "2025-07-17T19:22:44.775Z",
+      "actualPickupDate": "2025-09-25T10:48:21.468Z",
+      "actualDeliveryDate": "2025-09-25T19:22:44.775Z",
       "carrierCompanyId": "34qejaho98pxcon8k9c0rg",
       "brokerCompanyId": "z72amqlg27m5bnpwr8ehc",
       "factoring": true,
@@ -1809,7 +1809,7 @@ export default {
       "weightLbs": 11640,
       "cargoDescription": "Textile goods",
       "createdDate": "2025-04-01T23:24:29.289Z",
-      "updatedDate": "2025-07-16T13:22:04.679Z"
+      "updatedDate": "2025-09-26T13:22:04.679Z"
     },
     {
       "id": "x6nb3vm459ih5m54v691ff",
@@ -1956,7 +1956,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-17T09:27:36.386Z",
+      "timestamp": "2025-09-25T09:27:36.386Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": false,
@@ -1993,7 +1993,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-17T02:03:22.146Z",
+      "timestamp": "2025-09-25T02:03:22.146Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": false,
@@ -2104,7 +2104,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-17T14:33:59.571Z",
+      "timestamp": "2025-09-25T14:33:59.571Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": true,
@@ -2171,7 +2171,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-16T11:18:52.204Z",
+      "timestamp": "2025-09-26T11:18:52.204Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": false,
@@ -2246,7 +2246,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-17T16:57:06.546Z",
+      "timestamp": "2025-09-25T16:57:06.546Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": false,
@@ -2358,7 +2358,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-17T05:11:59.529Z",
+      "timestamp": "2025-09-25T05:11:59.529Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": false,
@@ -2650,7 +2650,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-17T02:40:23.029Z",
+      "timestamp": "2025-09-25T02:40:23.029Z",
       "isRead": true,
       "isStarred": true,
       "isArchived": false,
@@ -2838,7 +2838,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-17T19:02:11.993Z",
+      "timestamp": "2025-09-25T19:02:11.993Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": false,
@@ -3016,7 +3016,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-17T18:37:41.042Z",
+      "timestamp": "2025-09-25T18:37:41.042Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": false,
@@ -3053,7 +3053,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-17T21:38:31.319Z",
+      "timestamp": "2025-09-25T21:38:31.319Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": false,
@@ -3083,7 +3083,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-16T08:49:03.204Z",
+      "timestamp": "2025-09-26T08:49:03.204Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": false,
@@ -3157,7 +3157,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-17T12:58:31.537Z",
+      "timestamp": "2025-09-25T12:58:31.537Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": true,
@@ -3194,7 +3194,7 @@ export default {
       ],
       "cc": [],
       "bcc": [],
-      "timestamp": "2025-07-17T15:52:22.319Z",
+      "timestamp": "2025-09-25T15:52:22.319Z",
       "isRead": true,
       "isStarred": false,
       "isArchived": false,
@@ -3285,7 +3285,7 @@ export default {
       "type": "load_update",
       "title": "Load #L-880876 Status Update",
       "message": "Load #L-880876 has been updated to 'cancelled'.",
-      "timestamp": "2025-07-17T04:02:07.639Z",
+      "timestamp": "2025-09-25T04:02:07.639Z",
       "status": "read",
       "relatedEntityType": "load",
       "relatedEntityId": "x6nb3vm459ih5m54v691ff",
@@ -3297,7 +3297,7 @@ export default {
       "type": "system_message",
       "title": "System Notification",
       "message": "Important information regarding your account.",
-      "timestamp": "2025-07-17T02:14:03.786Z",
+      "timestamp": "2025-09-25T02:14:03.786Z",
       "status": "read"
     },
     {
@@ -3317,7 +3317,7 @@ export default {
       "type": "process_update",
       "title": "Process Update: Driver Onboarding",
       "message": "Step 'We appreciate your' completed in process ID: rr1so390ojaz1aivben7n.",
-      "timestamp": "2025-07-17T23:56:43.779Z",
+      "timestamp": "2025-09-25T23:56:43.779Z",
       "status": "read"
     },
     {
@@ -3326,7 +3326,7 @@ export default {
       "type": "system_message",
       "title": "System Notification",
       "message": "Important information regarding your account.",
-      "timestamp": "2025-07-17T07:36:45.309Z",
+      "timestamp": "2025-09-25T07:36:45.309Z",
       "status": "read"
     },
     {
@@ -3347,7 +3347,7 @@ export default {
       "type": "system_message",
       "title": "System Notification",
       "message": "Further details will follow shortly.",
-      "timestamp": "2025-07-17T07:28:26.244Z",
+      "timestamp": "2025-09-25T07:28:26.244Z",
       "status": "read"
     },
     {
@@ -3356,7 +3356,7 @@ export default {
       "type": "new_load",
       "title": "New Load Available: #L-606935",
       "message": "A new load from Philadelphia, NC to Dallas, IN has been posted.",
-      "timestamp": "2025-07-16T11:15:22.613Z",
+      "timestamp": "2025-09-26T11:15:22.613Z",
       "status": "read",
       "relatedEntityType": "load",
       "relatedEntityId": "sc0e0yse1ijgaqbx11obk"
@@ -3367,7 +3367,7 @@ export default {
       "type": "new_load",
       "title": "New Load Available: #L-710406",
       "message": "A new load from Los Angeles, VA to Philadelphia, AZ has been posted.",
-      "timestamp": "2025-07-16T04:34:02.047Z",
+      "timestamp": "2025-09-26T04:34:02.047Z",
       "status": "read",
       "relatedEntityType": "load",
       "relatedEntityId": "c3svwnj3zqj2a7ow6s828j"
@@ -3378,7 +3378,7 @@ export default {
       "type": "driver_alert",
       "title": "Driver Alert: Daniel Lopez",
       "message": "Driver Daniel Lopez is approaching their maximum driving hours.",
-      "timestamp": "2025-07-17T22:30:18.340Z",
+      "timestamp": "2025-09-25T22:30:18.340Z",
       "status": "read",
       "relatedEntityType": "driver",
       "relatedEntityId": "cx5is2kuq1brhlwpnzvozn",
@@ -3432,7 +3432,7 @@ export default {
       "type": "process_update",
       "title": "Process Update: Load Booking",
       "message": "Step 'Confirming receipt of' completed in process ID: l04akltmhce9vt8w7a2k7o.",
-      "timestamp": "2025-07-17T16:23:04.592Z",
+      "timestamp": "2025-09-25T16:23:04.592Z",
       "status": "read"
     },
     {
@@ -3441,7 +3441,7 @@ export default {
       "type": "emergency_alert",
       "title": "EMERGENCY: Incident with David Thomas",
       "message": "Urgent: Driver David Thomas reported a minor accident near Chicago, WV.",
-      "timestamp": "2025-07-17T02:56:46.151Z",
+      "timestamp": "2025-09-25T02:56:46.151Z",
       "status": "read",
       "relatedEntityType": "driver",
       "relatedEntityId": "xjurg7y5m2rzt6pvp3epl"
@@ -3531,49 +3531,49 @@ export default {
           "id": "zt875ogsx2rkvrhrf0fm",
           "senderId": "1",
           "senderType": "me",
-          "timestamp": "2025-07-16T21:52:02.716Z",
+          "timestamp": "2025-09-26T21:52:02.716Z",
           "content": "Load #L-594099 is showing as delivered. Can you confirm, John Jackson?"
         },
         {
           "id": "up0scyxm07ckcgz5yhj3b",
           "senderId": "1",
           "senderType": "me",
-          "timestamp": "2025-07-17T03:27:46.422Z",
+          "timestamp": "2025-09-25T03:27:46.422Z",
           "content": "Have you checked the engine light, John Jackson?"
         },
         {
           "id": "ws4qep8043gmxl6fq59vc",
           "senderId": "1",
           "senderType": "me",
-          "timestamp": "2025-07-17T16:17:46.316Z",
+          "timestamp": "2025-09-25T16:17:46.316Z",
           "content": "Any update on load #L-594099? Estimated ETA?"
         },
         {
           "id": "rndfn1wpk5bayf7l35mvq7",
           "senderId": "3a3cfm9d52pdx3yc41akh",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T18:14:20.492Z",
+          "timestamp": "2025-09-25T18:14:20.492Z",
           "content": "Delivered Load #L-510153. Sending documents shortly."
         },
         {
           "id": "fovz6dfblajq6i56mttzfp",
           "senderId": "1",
           "senderType": "me",
-          "timestamp": "2025-07-17T05:18:06.949Z",
+          "timestamp": "2025-09-25T05:18:06.949Z",
           "content": "Load #L-510153 is showing as delivered. Can you confirm, John Jackson?"
         },
         {
           "id": "flq8sc1yg96joa90yuaqi",
           "senderId": "1",
           "senderType": "me",
-          "timestamp": "2025-07-17T06:06:12.193Z",
+          "timestamp": "2025-09-25T06:06:12.193Z",
           "content": "Have you checked the engine light, John Jackson?"
         },
         {
           "id": "iz63w921zia9a5riti7ipi",
           "senderId": "3a3cfm9d52pdx3yc41akh",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T17:14:01.504Z",
+          "timestamp": "2025-09-25T17:14:01.504Z",
           "content": "ETA for Load #L-588125 is 9:09:49 AM."
         }
       ]
@@ -3607,14 +3607,14 @@ export default {
           "id": "9t6bevezzhqymjj08f2etf",
           "senderId": "xxy6webehidwkeiqf01eyh",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T19:57:22.152Z",
+          "timestamp": "2025-09-25T19:57:22.152Z",
           "content": "I noticed a strange noise in the engine. Can I get it checked out?"
         },
         {
           "id": "kblkcrjemusw3jjpnj0kb",
           "senderId": "xxy6webehidwkeiqf01eyh",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T07:51:53.741Z",
+          "timestamp": "2025-09-25T07:51:53.741Z",
           "content": "Maintenance light is on. I'll be in Philadelphia next week."
         },
         {
@@ -3683,21 +3683,21 @@ export default {
           "id": "y24ktkvqljcuv3ih998br",
           "senderId": "o3g9cebvdd8dkfds7sof4i",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T18:18:46.229Z",
+          "timestamp": "2025-09-25T18:18:46.229Z",
           "content": "I need to schedule an oil change soon. My next available is 7/24/2025."
         },
         {
           "id": "j8gr8vjh2ui7qperhqdyed",
           "senderId": "o3g9cebvdd8dkfds7sof4i",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T22:25:26.065Z",
+          "timestamp": "2025-09-25T22:25:26.065Z",
           "content": "Maintenance light is on. I'll be in Phoenix next week."
         },
         {
           "id": "jyimugn0y4px0xuxtw7or",
           "senderId": "o3g9cebvdd8dkfds7sof4i",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T23:21:53.286Z",
+          "timestamp": "2025-09-25T23:21:53.286Z",
           "content": "I noticed a strange noise in the engine. Can I get it checked out?"
         },
         {
@@ -3773,21 +3773,21 @@ export default {
           "id": "t0s5leijvaedi2q8qwbhu",
           "senderId": "n76jqf3go736tf6hc8toa",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-16T21:56:27.077Z",
+          "timestamp": "2025-09-26T21:56:27.077Z",
           "content": "Load #L-926580 picked up. On my way to San Diego."
         },
         {
           "id": "qic61w4jpchrf05od56vo",
           "senderId": "n76jqf3go736tf6hc8toa",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T21:20:35.882Z",
+          "timestamp": "2025-09-25T21:20:35.882Z",
           "content": "Load #L-926580 picked up. On my way to San Diego."
         },
         {
           "id": "ecumk2yu6fhz7ikkdye7l",
           "senderId": "user_abc123",
           "senderType": "me",
-          "timestamp": "2025-07-17T17:30:17.133Z",
+          "timestamp": "2025-09-25T17:30:17.133Z",
           "content": "Driver Isabella Gonzalez, please confirm pickup at Philadelphia, IA."
         }
       ]
@@ -3835,14 +3835,14 @@ export default {
           "id": "j0pnbjrqb6bknlblpxqsc",
           "senderId": "cx5is2kuq1brhlwpnzvozn",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T05:58:16.066Z",
+          "timestamp": "2025-09-25T05:58:16.066Z",
           "content": "I noticed a strange noise in the engine. Can I get it checked out?"
         },
         {
           "id": "7v0a97px1x9pfd51jtkgdd",
           "senderId": "cx5is2kuq1brhlwpnzvozn",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T22:23:41.174Z",
+          "timestamp": "2025-09-25T22:23:41.174Z",
           "content": "ETA for Load #L-855963 is 9:13:35 AM."
         }
       ]
@@ -3911,14 +3911,14 @@ export default {
           "id": "78e2y57cg8lfanjj1eyri",
           "senderId": "hm3q6btc7y7kirnxxhic0n",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-16T11:38:53.428Z",
+          "timestamp": "2025-09-26T11:38:53.428Z",
           "content": "We will process this as soon as possible."
         },
         {
           "id": "1x20ccfmc55jln94b7xdak",
           "senderId": "user_abc123",
           "senderType": "me",
-          "timestamp": "2025-07-17T23:03:34.134Z",
+          "timestamp": "2025-09-25T23:03:34.134Z",
           "content": "Load #L-912230 is showing as delivered. Can you confirm, Michael Rodriguez?"
         }
       ]
@@ -4001,28 +4001,28 @@ export default {
           "id": "e50496jbhwh6gm71l5k1fp",
           "senderId": "user_abc123",
           "senderType": "me",
-          "timestamp": "2025-07-16T12:47:52.916Z",
+          "timestamp": "2025-09-26T12:47:52.916Z",
           "content": "Have you checked the engine light, William Jones?"
         },
         {
           "id": "z15bqrb7hkifz7o4pps8t9",
           "senderId": "got724orb8um2166n4njk",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T06:09:30.260Z",
+          "timestamp": "2025-09-25T06:09:30.260Z",
           "content": "Load #L-380667 picked up. On my way to San Antonio."
         },
         {
           "id": "4olbh2t28gns6sjhthqb8s",
           "senderId": "got724orb8um2166n4njk",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T18:15:13.639Z",
+          "timestamp": "2025-09-25T18:15:13.639Z",
           "content": "ETA for Load #L-301968 is 5:26:06 AM."
         },
         {
           "id": "8st19am0oy7kdwy1xkd3k",
           "senderId": "got724orb8um2166n4njk",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T16:28:46.990Z",
+          "timestamp": "2025-09-25T16:28:46.990Z",
           "content": "Delivered Load #L-301968. Sending documents shortly."
         }
       ]
@@ -4056,14 +4056,14 @@ export default {
           "id": "bjs0u2zf5sm205gp6vq7jag",
           "senderId": "user_abc123",
           "senderType": "me",
-          "timestamp": "2025-07-17T02:46:29.013Z",
+          "timestamp": "2025-09-25T02:46:29.013Z",
           "content": "Driver David Thomas, please confirm pickup at San Jose, PA."
         },
         {
           "id": "na8rblzyk6tqb3zvy9v1a",
           "senderId": "user_abc123",
           "senderType": "me",
-          "timestamp": "2025-07-17T20:07:53.904Z",
+          "timestamp": "2025-09-25T20:07:53.904Z",
           "content": "Any update on load #L-922013? Estimated ETA?"
         }
       ]
@@ -4146,21 +4146,21 @@ export default {
           "id": "kug9migpdgrtrjiao1fhr",
           "senderId": "user_abc123",
           "senderType": "me",
-          "timestamp": "2025-07-17T08:39:38.895Z",
+          "timestamp": "2025-09-25T08:39:38.895Z",
           "content": "Reminder: Your truck needs an oil change by 7/31/2025."
         },
         {
           "id": "bnoepisem5jkc8ddpbd28",
           "senderId": "user_abc123",
           "senderType": "me",
-          "timestamp": "2025-07-17T11:56:36.139Z",
+          "timestamp": "2025-09-25T11:56:36.139Z",
           "content": "Driver Amelia White, please confirm pickup at Phoenix, NC."
         },
         {
           "id": "dpz36qywq9z6u63lnp5c",
           "senderId": "i2mf30014rhyaps3bd7ecp",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T17:54:08.089Z",
+          "timestamp": "2025-09-25T17:54:08.089Z",
           "content": "Load #L-405234 picked up. On my way to Phoenix."
         }
       ]
@@ -4229,7 +4229,7 @@ export default {
           "id": "of2gv83z1p4ml7j1zlwda",
           "senderId": "nd9fcsf2jbicjimkrp7js8",
           "senderType": "ai_agent",
-          "timestamp": "2025-07-17T20:16:53.340Z",
+          "timestamp": "2025-09-25T20:16:53.340Z",
           "content": "ETA for Load #L-880876 is 2:42:05 PM."
         }
       ]
@@ -4333,7 +4333,7 @@ export default {
           "id": "mahbyexoslr3lctx7yac",
           "senderId": "user_abc123",
           "senderType": "me",
-          "timestamp": "2025-07-16T07:07:05.881Z",
+          "timestamp": "2025-09-26T07:07:05.881Z",
           "content": "Load #L-563385 is showing as delivered. Can you confirm, William Jones?"
         }
       ]
