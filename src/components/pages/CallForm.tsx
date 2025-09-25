@@ -5,7 +5,7 @@ import Headphone from "../ui/animation/Headphone";
 import { useEffect, useState } from "react";
 import { ErrorAnimated } from "../ui/animation/ErrorAnimated";
 import { obtainDispatcher, obtainDriver, obtainTrailer, obtainVehicle, outBoundCall } from "@/api";
-import { Dispatcher, Driver, Vehicule, Trailer } from '@/types/app';
+import { Dispatcher, DriverForm as Driver, Vehicule, Trailer } from '@/types/app';
 import { LoadingScreen } from "../ui/animation/loadingScreen";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 
@@ -212,7 +212,7 @@ export const CallForm = () => {
 
           //driver
           driver_name:           `${ driver?.firstName } ${ driver?.lastName }`,
-          driver_phone:          driver?.phone ?? '',
+          driver_phone:          driver?.phoneNumber ?? '',
 
           // trailer
           truck_number:          String(vehicle?.id),

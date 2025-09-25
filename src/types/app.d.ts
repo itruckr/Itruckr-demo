@@ -588,7 +588,7 @@ export interface Broker {
     brokerActive:    boolean;
 }
 
-export interface Driver {
+export interface DriverForm {
     id:                     string;
     firstName:              string;
     lastName:               string;
