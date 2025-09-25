@@ -19,7 +19,7 @@ type FormInputs = {
   commodity: string;
   delivery_date: string;
   pickup_date: string;
-  load_reference: string;
+  load_number: string;
   to_number: string;
   trailer_type: string;
 
@@ -75,6 +75,7 @@ export const CallForm = () => {
   const [trailers, setTrailers] = useState<Trailer[]>([]);
   const [lastData, setLastData] = useState<any | null>(null);
   const [audioUrl, setAudioUrl] = useState<any | null>(null);
+  const [copied, setCopied] = useState(false);
   const { handleSubmit, register, formState: { isValid }, reset } = useForm<FormInputs>({
         defaultValues: {
             
@@ -188,29 +189,39 @@ export const CallForm = () => {
       to_number: data.to_number,
       conversation_initiation_client_data:{
         dynamic_variables: {
-          company_name:          company?.name ?? '',
-          company_mc_number:     company?.mcNumber ?? '',
+          BrokerName:            data.broker_name,
           origin:                data.origin,
           destination:           data.destination,
-          BrokerName:            data.broker_name,
           weight:                String(data.weight),
           rate:                  data.rate,
-          proposed_rate:         data.proposed_rate,
           final_rate:            '',
-          company_email:         company?.email ?? '',
-          driver_name:           `${ driver?.firstName } ${ driver?.lastName }`,
-          dispatcher_phone:      dispatcher?.phoneNumber ?? '',
-          truck_number:          String(vehicle?.id),
-          trailer_number:        trailer?.unit ?? '',
-          load_reference:        data.load_reference,
+          load_number:           data.load_number,
           delivery_date:         data.delivery_date,
           pickup_date:           data.pickup_date,
-          proposed_rate_minimum: data.proposed_rate_minimum,
-          driver_phone:          driver?.phone ?? '',
           length:                data.length,
           commodity:             data.commodity,
-          dispatcher_email:      company?.email ?? '',
+
+          //proposed
+          proposed_rate:         data.proposed_rate,
+          proposed_rate_minimum: data.proposed_rate_minimum,
+
+          //company
+          company_name:          company?.name ?? '',
+          mc_number:             company?.mcNumber ?? '',
+          company_email:         company?.email ?? '',
+
+          //driver
+          driver_name:           `${ driver?.firstName } ${ driver?.lastName }`,
+          driver_phone:          driver?.phone ?? '',
+
+          // trailer
+          truck_number:          String(vehicle?.id),
           trailer_type:          data.trailer_type,
+          trailer_number:        trailer?.unit ?? '',
+
+          // dispatcher
+          dispatcher_email:      company?.email ?? '',
+          dispatcher_phone:      dispatcher?.phoneNumber ?? '',
           dispatcher_name:       `${dispatcher?.firstName} ${dispatcher?.lastName}`,
         }
       }
@@ -231,6 +242,15 @@ export const CallForm = () => {
     setAudioUrl(null);
   }
 
+  const copyTranscript = () => {
+    if (lastData?.transcript) {
+      navigator.clipboard.writeText(lastData.transcript)
+        .then(() => setCopied(true))
+        .catch((err) => console.error("Error copiando:", err));
+      
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   return (
     <>
@@ -421,11 +441,11 @@ export const CallForm = () => {
             </div>
 
             <div className="flex flex-col mb-2">
-              <span>Load Reference</span>
+              <span>Load Number</span>
               <input
                   type="text"
                   className="p-2 border rounded-md bg-gray-200"
-                  { ...register('load_reference') }
+                  { ...register('load_number') }
               />
             </div>
 
@@ -540,6 +560,11 @@ export const CallForm = () => {
                   <p>
                     <strong>Transcript:</strong>
                   </p>
+                  <button 
+                    disabled={ copied }
+                    onClick={copyTranscript} className="btn-primary">
+                    {copied ? "Copied!" : "Copy Transcript"}
+                  </button>
                   <pre className="bg-gray-100 p-2 text-left rounded text-sm whitespace-pre-wrap">
                     {lastData.transcript}
                   </pre>

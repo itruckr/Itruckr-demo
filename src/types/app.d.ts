@@ -642,7 +642,7 @@ export interface ConversationInitiationClientData {
 
 export interface DynamicVariables {
     company_name:          string;
-    company_mc_number:     string;
+    mc_number:             string;
     origin:                string;
     destination:           string;
     BrokerName:            string;
@@ -655,7 +655,7 @@ export interface DynamicVariables {
     dispatcher_phone:      string;
     truck_number:          string;
     trailer_number:        string;
-    load_reference:        string;
+    load_number:        string;
     delivery_date:         string;
     pickup_date:           string;
     proposed_rate_minimum: string;
