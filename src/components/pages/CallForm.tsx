@@ -74,6 +74,7 @@ export const CallForm = () => {
   const [vehicles, setVehicles] = useState<Vehicule[]>([]);
   const [trailers, setTrailers] = useState<Trailer[]>([]);
   const [lastData, setLastData] = useState<any | null>(null);
+  const [audioUrl, setAudioUrl] = useState<any | null>(null);
   const { handleSubmit, register, formState: { isValid }, reset } = useForm<FormInputs>({
         defaultValues: {
             
@@ -167,6 +168,10 @@ export const CallForm = () => {
           setLoading('info');
         }, 2000);
       }
+
+      if (lastMessage.type ==  "post-call-audio-webhook") {
+        setAudioUrl(lastMessage.url);
+      }
     }
   }, [messages]);
   
@@ -220,9 +225,10 @@ export const CallForm = () => {
   }
 
   const resetForm = () => {
-    reset();
+    //reset();
     setLoading('create');
     setLastData(null);
+    setAudioUrl(null);
   }
 
 
@@ -233,7 +239,7 @@ export const CallForm = () => {
           <form onSubmit={ handleSubmit( onSubmit ) } className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2">
 
             <div className="flex flex-col mb-2">
-              <span>Telefono Broker</span>
+              <span>Broker phone</span>
               <input
                   type="text"
                   className="p-2 border rounded-md bg-gray-200"
@@ -504,6 +510,18 @@ export const CallForm = () => {
           <div className="p-4 border rounded-md shadow-sm">
             <h2 className="font-bold text-lg mb-2">Estado de la llamada</h2>
 
+            {
+              audioUrl && (
+                <div className="flex w-full justify-center p-2 mt-2">
+                  <audio controls >
+                      <source src={ audioUrl } type="audio/mpeg" />
+                    Tu navegador no soporta audio.
+                  </audio>
+                </div>
+                
+              )
+            }
+
             {lastData && (
               <>
                 <div className="mt-4 space-y-2">
@@ -535,7 +553,6 @@ export const CallForm = () => {
         )
       }
 
-      
     </>
   )
 }

@@ -47,7 +47,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log("📩 Mensaje entrante:", data);
+        //console.log("📩 Mensaje entrante:", data);
 
         if (data.type === "pong") return;
         setMessages((prev) => [...prev, data]);
