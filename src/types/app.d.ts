@@ -666,3 +666,40 @@ export interface DynamicVariables {
     trailer_type:          string;
     dispatcher_name:       string;
 }
+
+export interface WhatsappChat {
+  id: string;
+  name: string;
+  type: string;
+  waId: string;
+  asstId: string;
+  threadId: string;
+  createdAt: string;
+  updatedAt: string;
+  messages: string;
+  unreadCount: number;
+  status: string;
+  language: string;
+}
+
+export interface WhatsappMessage {
+  id: string;
+  messageId: string;
+  type: string;
+  body?: string;
+  filename?: string;
+  mimeType?: string;
+  sha256?: string;
+  multimediaId?: string;
+  chatId: string;
+  createdAt: string;
+  updatedAt: string;
+  messageFrom: string;
+  senderId?: string;
+  senderName?: string;
+  url?: string;
+  loadId: number;
+  isBundle: boolean;
+  status: string;
+  questionNumber: number;
+}

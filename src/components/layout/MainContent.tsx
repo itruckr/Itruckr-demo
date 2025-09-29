@@ -9,6 +9,7 @@ import { CallForm } from '@/components/pages/CallForm';
 import { useNavigation } from '@/contexts/NavigationContext';
 
 import { Loadboard } from '../pages/Loadboard';
+import Whatsapp from '../pages/watsapp';
 
 export function MainContent() {
   const { activePage } = useNavigation();
@@ -33,6 +34,8 @@ export function MainContent() {
         return <Email />;
       case 'call-form':
         return <CallForm />;
+      case 'whatsapp':
+        return <Whatsapp />;
       default:
         return <Dashboard />;
     }
