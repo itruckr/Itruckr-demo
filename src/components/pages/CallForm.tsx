@@ -304,10 +304,13 @@ export const CallForm = () => {
   const fillOutForm = (result: any) => {
     const origin = result.trip.origin;
     const destination =  result.trip.destination;
-    const rate = result.rate.total_usd
-    const load_details = result.load_details
+    const rate = result.rate.total_usd;
+    const load_details = result.load_details;
+    const company = result.company;
+
     
     reset({
+      to_number: company.contact_phone,
       origin: `${origin.city} ${origin.state}`,
       pickup_date: origin.pickup_date,
       pickup_time_min: toInputTime(origin.pickup_time_window_start),
@@ -318,7 +321,7 @@ export const CallForm = () => {
       delivery_time_min: toInputTime(destination.delivery_time_window_end),
       weight: Number(load_details.weight_lbs),
       broker_offer: rate,
-      //load_number: ``
+      load_number: load_details.load_number
     });
 
     setisOpenDAT(true);
@@ -334,7 +337,7 @@ export const CallForm = () => {
   return (
     <>
       <UploadFile
-        label="DAT File"
+        label="Search data"
         handleFileChange={ handleFileChange }
       />
       
@@ -342,7 +345,7 @@ export const CallForm = () => {
         loading === "create" && (
           <form onSubmit={ handleSubmit( onSubmit ) } className="grid grid-cols-1 gap-5">
 
-            <CollapseList title="General information" isOpenInit={ true } >
+            <CollapseList title="General info" isOpenInit={ true } >
               <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
                 <div className="flex flex-col mb-2">
                   <span>Broker phone</span>
@@ -434,82 +437,18 @@ export const CallForm = () => {
               </div>
             </CollapseList>
 
-            <CollapseList title="DAT information" isOpen={ isOpenDAT } onToggle={ () => setisOpenDAT(!isOpenDAT) } >
+            <CollapseList title="Load info" isOpen={ isOpenDAT } onToggle={ () => setisOpenDAT(!isOpenDAT) } >
               <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
                 <div className="flex flex-col mb-2">
-                  <span>Origin</span>
+                  <span >Load Number</span>
                   <input
                       type="text"
                       className="p-2 border rounded-md bg-gray-200"
-                      { ...register('origin', { required: true }) }
+                      { ...register('load_number') }
                   />
                 </div>
-
                 <div className="flex flex-col mb-2">
-                  <span>Destination</span>
-                  <input
-                      type="text"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('destination', { required: true }) }
-                  />
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span>Pickup Date</span>
-                  <input
-                      type="date"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('pickup_date') }
-                  />
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span>Pickup Time Min</span>
-                  <input
-                      type="time"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('pickup_time_min') }
-                  />
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span>Pickup Time Max</span>
-                  <input
-                      type="time"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('pickup_time_max') }
-                  />
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span>Delivery Date</span>
-                  <input
-                      type="date"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('delivery_date') }
-                  />
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span>Delivery Time Min</span>
-                  <input
-                      type="time"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('delivery_time_min') }
-                  />
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span>Delivery Time Max</span>
-                  <input
-                      type="time"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('delivery_time_max') }
-                  />
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span>Weight</span>
+                  <span >Weight</span>
                   <input
                       type="text"
                       className="p-2 border rounded-md bg-gray-200"
@@ -518,22 +457,97 @@ export const CallForm = () => {
                 </div>
 
                 <div className="flex flex-col mb-2">
-                  <span>Offer</span>
+                  <span >Offer</span>
                   <input
                       type="text"
                       className="p-2 border rounded-md bg-gray-200"
                       { ...register('broker_offer', { required: true }) }
                   />
                 </div>
+              </div> 
 
-                <div className="flex flex-col mb-2">
-                  <span>Load Number</span>
-                  <input
-                      type="text"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('load_number') }
-                  />
+              <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 my-3">
+
+                <div className="flex flex-col gap-5 bg-gray-100 rounded-lg shadow-md p-5">
+                  <div className="flex p-2 justify-start">
+                    <h2 className="font-bold">Pick up</h2>
+                  </div>
+                  <div className="flex flex-col mb-2">
+                    <span >Origin</span>
+                    <input
+                        type="text"
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('origin', { required: true }) }
+                    />
+                  </div>
+                  <div className="flex flex-col mb-2">
+                    <span >Pickup Date</span>
+                    <input
+                        type="date"
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('pickup_date') }
+                    />
+                  </div>
+
+                  <div className="flex flex-col mb-2">
+                    <span >Pickup Time Min</span>
+                    <input
+                        type="time"
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('pickup_time_min') }
+                    />
+                  </div>
+
+                  <div className="flex flex-col mb-2">
+                    <span >Pickup Time Max</span>
+                    <input
+                        type="time"
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('pickup_time_max') }
+                    />
+                  </div>
                 </div>
+
+                <div className="flex flex-col gap-5 bg-gray-100 rounded-lg shadow-md p-5">
+                  <div className="flex p-2 justify-start">
+                    <h2 className="font-bold">Delivery</h2>
+                  </div>
+                  <div className="flex flex-col mb-2">
+                      <span >Destination</span>
+                      <input
+                          type="text"
+                          className="p-2 border rounded-md  bg-gray-200"
+                          { ...register('destination', { required: true }) }
+                      />
+                    </div>
+                    <div className="flex flex-col mb-2">
+                    <span >Delivery Date</span>
+                    <input
+                        type="date"
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('delivery_date') }
+                    />
+                  </div>
+
+                  <div className="flex flex-col mb-2">
+                    <span >Delivery Time Min</span>
+                    <input
+                        type="time"
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('delivery_time_min') }
+                    />
+                  </div>
+
+                  <div className="flex flex-col mb-2">
+                    <span >Delivery Time Max</span>
+                    <input
+                        type="time"
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('delivery_time_max') }
+                    />
+                  </div>
+                </div>   
+              
               </div>
             </CollapseList>
 

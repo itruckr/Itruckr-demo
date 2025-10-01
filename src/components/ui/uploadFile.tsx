@@ -9,7 +9,7 @@ interface UploadFileProps {
 
 export const UploadFile: React.FC<UploadFileProps> = ({
   label = "Upload File",
-  description = "Upload or darg & drop your file PNG, JPG.",
+  description = "Upload or drag & drop your file PNG, JPG.",
   accept = "image/*",
   handleFileChange,
 }: UploadFileProps ) => {
