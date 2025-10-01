@@ -17,7 +17,7 @@ const LoginPage: React.FC<{ onGoRegister: () => void }> = ({ onGoRegister }) => 
   const [error, setError] = useState('');
 
   const getAccessToken = async () => {
-    const result = await obtainAccessToken('briana', 'briana');
+    const result = await obtainAccessToken('barango', 'b@rang0#');
   
     return result.access_token
   }
