@@ -641,30 +641,33 @@ export interface ConversationInitiationClientData {
 }
 
 export interface DynamicVariables {
-    company_name:          string;
-    mc_number:             string;
-    origin:                string;
-    destination:           string;
-    BrokerName:            string;
-    weight:                string;
-    rate:                  string;
-    proposed_rate:         string;
-    final_rate:            string;
-    company_email:         string;
-    driver_name:           string;
-    dispatcher_phone:      string;
-    truck_number:          string;
-    trailer_number:        string;
-    load_number:        string;
-    delivery_date:         string;
-    pickup_date:           string;
-    proposed_rate_minimum: string;
-    driver_phone:          string;
-    length:                string;
-    commodity:             string;
-    dispatcher_email:      string;
-    trailer_type:          string;
-    dispatcher_name:       string;
+  dispatcher_name: string;
+  company_name: string;
+  mc_number: string;
+  company_email: string;
+
+  origin: string;
+  destination: string;
+  pickup_date: string;
+  pickup_time_min: string;
+  pickup_time_max: string;
+  delivery_date: string;
+  delivery_time_min: string;
+  delivery_time_max: string;
+  weight: string;
+  truck_specs: string;
+  proposed_rate: string;
+  proposed_rate_minimum: string;
+  final_rate: string;
+  load_number: string;
+
+  broker_offer: string;
+
+  truck_number: string;
+  trailer_number: string;
+  
+  driver_phone: string;
+  driver_name: string;
 }
 
 export interface WhatsappChat {

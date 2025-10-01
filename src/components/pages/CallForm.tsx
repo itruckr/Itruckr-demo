@@ -4,24 +4,34 @@ import SucessFull from "../ui/animation/Sucessfull";
 import Headphone from "../ui/animation/Headphone";
 import { useEffect, useState } from "react";
 import { ErrorAnimated } from "../ui/animation/ErrorAnimated";
-import { obtainDispatcher, obtainDriver, obtainTrailer, obtainVehicle, outBoundCall } from "@/api";
+import { datExtractorSingleLoad, obtainDispatcher, obtainDriver, obtainTrailer, obtainVehicle, outBoundCall } from "@/api";
 import { Dispatcher, DriverForm as Driver, Vehicule, Trailer } from '@/types/app';
 import { LoadingScreen } from "../ui/animation/loadingScreen";
 import { useWebSocket } from "@/contexts/WebSocketContext";
+import { UploadFile } from '../ui/uploadFile';
+import toInputTime from "@/utils/hour_format";
+import { CollapseList } from '../ui/collapse_list';
+
+
+declare global {
+  interface Window {
+    DavidAI: any;
+  }
+}
 
 type FormInputs = {
   origin: string;
   destination: string;
-  broker_name: string;
-  weight: number;
-  rate: string;
-  length: string;
-  commodity: string;
-  delivery_date: string;
   pickup_date: string;
+  pickup_time_min:       string,
+  pickup_time_max:       string,
+  delivery_date: string;
+  delivery_time_min:      string,
+  delivery_time_max:      string,
+  weight: number;
   load_number: string;
   to_number: string;
-  trailer_type: string;
+  broker_offer: string,
 
   // business
   proposed_rate: string,
@@ -31,8 +41,15 @@ type FormInputs = {
   // truck
   vehicle: string;
   trailer: string;
+  trailer_type: string;
+
+  //driver
   driver: string;
+
+  //company
   company: string;
+  
+  //dispa
   dispatcher: string;
 }
 
@@ -75,6 +92,7 @@ export const CallForm = () => {
   const [trailers, setTrailers] = useState<Trailer[]>([]);
   const [lastData, setLastData] = useState<any | null>(null);
   const [audioUrl, setAudioUrl] = useState<any | null>(null);
+  const [isOpenDAT, setisOpenDAT] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
   const { handleSubmit, register, formState: { isValid }, reset } = useForm<FormInputs>({
         defaultValues: {
@@ -189,17 +207,19 @@ export const CallForm = () => {
       to_number: data.to_number,
       conversation_initiation_client_data:{
         dynamic_variables: {
-          BrokerName:            data.broker_name,
           origin:                data.origin,
           destination:           data.destination,
-          weight:                String(data.weight),
-          rate:                  data.rate,
-          final_rate:            '',
-          load_number:           data.load_number,
-          delivery_date:         data.delivery_date,
           pickup_date:           data.pickup_date,
-          length:                data.length,
-          commodity:             data.commodity,
+          pickup_time_min:       data.pickup_time_max,
+          pickup_time_max:       data.pickup_time_min,
+          delivery_date:         data.delivery_date,
+          delivery_time_min:     data.delivery_time_max,
+          delivery_time_max:     data.delivery_time_min,
+          weight:                String(data.weight),
+          
+          final_rate: '',
+          load_number:           data.load_number,
+          broker_offer:           data.broker_offer,
 
           //proposed
           proposed_rate:         data.proposed_rate,
@@ -216,12 +236,10 @@ export const CallForm = () => {
 
           // trailer
           truck_number:          String(vehicle?.id),
-          trailer_type:          data.trailer_type,
           trailer_number:        trailer?.unit ?? '',
+          truck_specs:           '[{"type":"straps","status":"available"},{"type":"refrigeration/temp control","status":"not available"},{"type":"extra stops","status":"available"}]',
 
           // dispatcher
-          dispatcher_email:      company?.email ?? '',
-          dispatcher_phone:      dispatcher?.phoneNumber ?? '',
           dispatcher_name:       `${dispatcher?.firstName} ${dispatcher?.lastName}`,
         }
       }
@@ -252,224 +270,292 @@ export const CallForm = () => {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const file = e.target.files?.[0];
+      if (!file) {
+        resolve(); // nada que hacer
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onloadend = async () => {
+        try {
+          if (typeof reader.result === "string") {
+            const image = reader.result;
+            const base64 = image.split(",")[1];
+            
+            const result = await datExtractorSingleLoad(base64!);
+            fillOutForm(result);
+            
+          }
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      };
+
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const fillOutForm = (result: any) => {
+    const origin = result.trip.origin;
+    const destination =  result.trip.destination;
+    const rate = result.rate.total_usd
+    const load_details = result.load_details
+    
+    reset({
+      origin: `${origin.city} ${origin.state}`,
+      pickup_date: origin.pickup_date,
+      pickup_time_min: toInputTime(origin.pickup_time_window_start),
+      pickup_time_max: toInputTime(origin.pickup_time_window_end),
+      destination: `${destination.city} ${destination.state}`,
+      delivery_date: destination.delivery_date,
+      delivery_time_max: toInputTime(destination.delivery_time_window_start),
+      delivery_time_min: toInputTime(destination.delivery_time_window_end),
+      weight: Number(load_details.weight_lbs),
+      broker_offer: rate,
+      //load_number: ``
+    });
+
+    setisOpenDAT(true);
+  }
+
+  useEffect(() => {
+    if (window.DavidAI) {
+      window.DavidAI.initCollapse();
+    }
+  }, []);
+
+
   return (
     <>
+      <UploadFile
+        label="DAT File"
+        handleFileChange={ handleFileChange }
+      />
+      
       {
         loading === "create" && (
-          <form onSubmit={ handleSubmit( onSubmit ) } className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2">
+          <form onSubmit={ handleSubmit( onSubmit ) } className="grid grid-cols-1 gap-5">
 
-            <div className="flex flex-col mb-2">
-              <span>Broker phone</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  autoFocus
-                  { ...register('to_number', { required: true }) }
-              />
-            </div>
-      
-            <div className="flex flex-col mb-2">
-              <span>Dispatcher</span>
-              <select
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('dispatcher', { required: true }) }
-              >
-                <option value="">[ Seleccione ]</option>
-                
-                {
-                  dispatchers.map((dispacht) => (
-                    <option key={ dispacht.id } value={ dispacht.id }>{ dispacht.firstName } {dispacht.lastName}</option>
-                  ))
-                }
-              </select>
-            </div>
+            <CollapseList title="General information" isOpenInit={ true } >
+              <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
+                <div className="flex flex-col mb-2">
+                  <span>Broker phone</span>
+                  <input
+                      type="text"
+                      className="p-2 border rounded-md bg-gray-200"
+                      autoFocus
+                      { ...register('to_number', { required: true }) }
+                  />
+                </div>
+          
+                <div className="flex flex-col mb-2">
+                  <span>Dispatcher</span>
+                  <select
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('dispatcher', { required: true }) }
+                  >
+                    <option value="">[ Seleccione ]</option>
+                    
+                    {
+                      dispatchers.map((dispacht) => (
+                        <option key={ dispacht.id } value={ dispacht.id }>{ dispacht.firstName } {dispacht.lastName}</option>
+                      ))
+                    }
+                  </select>
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Company</span>
-              <select
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('company', { required: true }) }
-              >
-                  <option value="">[ Seleccione ]</option>
-                  
-                  {
-                    authorities.map((company) => (
-                      <option key={ company.id } value={ company.id }>{ company.name }</option>
-                    ))
-                  }
-              </select>
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Company</span>
+                  <select
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('company', { required: true }) }
+                  >
+                      <option value="">[ Seleccione ]</option>
+                      
+                      {
+                        authorities.map((company) => (
+                          <option key={ company.id } value={ company.id }>{ company.name }</option>
+                        ))
+                      }
+                  </select>
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Driver</span>
-              <select
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('driver', { required: true }) }
-              >
-                <option value="">[ Seleccione ]</option>
-                
-                {
-                  Drivers.map((drvier) => (
-                    <option key={ drvier.id } value={ drvier.id }>{ drvier.firstName } { drvier.lastName }</option>
-                  ))
-                }
-              </select>
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Driver</span>
+                  <select
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('driver', { required: true }) }
+                  >
+                    <option value="">[ Seleccione ]</option>
+                    
+                    {
+                      Drivers.map((drvier) => (
+                        <option key={ drvier.id } value={ drvier.id }>{ drvier.firstName } { drvier.lastName }</option>
+                      ))
+                    }
+                  </select>
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Vehicle</span>
-              <select
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('vehicle', { required: true }) }
-              >
-                  <option value="">[ Seleccione ]</option>
-                  {
-                    vehicles.map((vehicle) => (
-                      <option key={ vehicle.id } value={ vehicle.id }>{ vehicle.id }</option>
-                    ))
-                  }
-              </select>
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Vehicle</span>
+                  <select
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('vehicle', { required: true }) }
+                  >
+                      <option value="">[ Seleccione ]</option>
+                      {
+                        vehicles.map((vehicle) => (
+                          <option key={ vehicle.id } value={ vehicle.id }>{ vehicle.id }</option>
+                        ))
+                      }
+                  </select>
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Trailer</span>
-              <select
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('trailer', { required: true }) }
-              >
-                  <option value="">[ Seleccione ]</option>
-                  {
-                    trailers.map((trailer) => (
-                      <option key={ trailer.id } value={ trailer.id }>{ trailer.unit }</option>
-                    ))
-                  }
-              </select>
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Trailer</span>
+                  <select
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('trailer', { required: true }) }
+                  >
+                      <option value="">[ Seleccione ]</option>
+                      {
+                        trailers.map((trailer) => (
+                          <option key={ trailer.id } value={ trailer.id }>{ trailer.unit }</option>
+                        ))
+                      }
+                  </select>
+                </div>
+              </div>
+            </CollapseList>
 
-            <div className="flex flex-col mb-2">
-              <span>Tipo de Trailer</span>
-              <select
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('trailer_type', { required: true }) }
-              >
-                  <option value="">[ Seleccione ]</option>
-                  <option value="Dry van">Dry van</option>
-                  <option value="Reefer">Reefer</option>
-                  <option value="Flatbed">Flatbed</option>
-              </select>
-            </div>
+            <CollapseList title="DAT information" isOpen={ isOpenDAT } onToggle={ () => setisOpenDAT(!isOpenDAT) } >
+              <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
+                <div className="flex flex-col mb-2">
+                  <span>Origin</span>
+                  <input
+                      type="text"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('origin', { required: true }) }
+                  />
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Origin</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('origin', { required: true }) }
-              />
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Destination</span>
+                  <input
+                      type="text"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('destination', { required: true }) }
+                  />
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Destination</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('destination', { required: true }) }
-              />
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Pickup Date</span>
+                  <input
+                      type="date"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('pickup_date') }
+                  />
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Broker Name</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('broker_name', { required: true }) }
-              />
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Pickup Time Min</span>
+                  <input
+                      type="time"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('pickup_time_min') }
+                  />
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Weight</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('weight', { required: true }) }
-              />
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Pickup Time Max</span>
+                  <input
+                      type="time"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('pickup_time_max') }
+                  />
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Posted rate</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('rate', { required: true }) }
-              />
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Delivery Date</span>
+                  <input
+                      type="date"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('delivery_date') }
+                  />
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Length</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('length') }
-              />
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Delivery Time Min</span>
+                  <input
+                      type="time"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('delivery_time_min') }
+                  />
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Commodity</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('commodity') }
-              />
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Delivery Time Max</span>
+                  <input
+                      type="time"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('delivery_time_max') }
+                  />
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Pickup Date</span>
-              <input
-                  type="date"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('pickup_date') }
-              />
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Weight</span>
+                  <input
+                      type="text"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('weight', { required: true }) }
+                  />
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Delivery Date</span>
-              <input
-                  type="date"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('delivery_date') }
-              />
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Offer</span>
+                  <input
+                      type="text"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('broker_offer', { required: true }) }
+                  />
+                </div>
 
-            <div className="flex flex-col mb-2">
-              <span>Load Number</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('load_number') }
-              />
-            </div>
+                <div className="flex flex-col mb-2">
+                  <span>Load Number</span>
+                  <input
+                      type="text"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('load_number') }
+                  />
+                </div>
+              </div>
+            </CollapseList>
 
-            <div className="flex flex-col mb-2">
-              <span>Expected rate</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('proposed_rate') }
-              />
-            </div>
-
-
-            <div className="flex flex-col mb-2">
-              <span>Minimum rate</span>
-              <input
-                  type="text"
-                  className="p-2 border rounded-md bg-gray-200"
-                  { ...register('proposed_rate_minimum') }
-              />
-            </div>
+            <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
+              <div className="flex flex-col mb-2">
+                <span>Expected rate</span>
+                <input
+                    type="text"
+                    className="p-2 border rounded-md bg-gray-200"
+                    { ...register('proposed_rate') }
+                />
+              </div>
 
 
-            <div className="flex flex-col mb-2">
+              <div className="flex flex-col mb-2">
+                <span>Minimum rate</span>
+                <input
+                    type="text"
+                    className="p-2 border rounded-md bg-gray-200"
+                    { ...register('proposed_rate_minimum') }
+                />
+              </div>
             </div>
 
             <div className="flex flex-col mb-2 sm:mt-2">

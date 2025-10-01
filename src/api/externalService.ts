@@ -21,3 +21,20 @@ export const outBoundCall = async (
     throw err;
   }
 };
+
+export const datExtractorSingleLoad = async (
+  base64: string
+) => {
+  try {
+    const url = `${external}/openai/vision/extractor`;
+
+    const { data } = await axios.post(url, { base64 });
+
+    return data;
+  } catch (err: any) {
+    if (err.response?.status === 401) {
+      throw new Error("Invalid user credentials");
+    }
+    throw err;
+  }
+};
