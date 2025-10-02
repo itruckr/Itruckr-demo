@@ -142,4 +142,37 @@
   .status-error {
     @apply bg-custom-error bg-opacity-20 text-custom-error;
   }
+
+  /* Estilos para react-time-picker */
+  .react-time-picker {
+    @apply w-full;
+  }
+
+  .react-time-picker__wrapper {
+    @apply border border-custom-border rounded-md bg-custom-surface px-3 py-2 w-full;
+  }
+
+  .react-time-picker__inputGroup {
+    @apply flex w-full justify-center;
+  }
+
+  .react-time-picker__clear-button,
+  .react-time-picker__clock-button {
+    display: none;
+  }
 }
+
+.react-time-picker__inputGroup__input {
+  width: 2.5rem !important; /* o prueba 4rem si lo quieres más grande */
+  min-width: 2.5rem !important;
+  background-color: transparent;
+  text-align: center;
+  font-size: 1rem; /* text-base */
+  font-weight: 500;
+}
+
+.react-time-picker__inputGroup__divider {
+  margin-right: 15px;
+}
+
+

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import SucessFull from "../ui/animation/Sucessfull";
 import Headphone from "../ui/animation/Headphone";
 import { useEffect, useState } from "react";
@@ -11,6 +11,7 @@ import { useWebSocket } from "@/contexts/WebSocketContext";
 import { UploadFile } from '../ui/uploadFile';
 import toInputTime from "@/utils/hour_format";
 import { CollapseList } from '../ui/collapse_list';
+import Time from "../ui/timer";
 
 
 declare global {
@@ -94,9 +95,12 @@ export const CallForm = () => {
   const [audioUrl, setAudioUrl] = useState<any | null>(null);
   const [isOpenDAT, setisOpenDAT] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
-  const { handleSubmit, register, formState: { isValid }, reset } = useForm<FormInputs>({
+  const { handleSubmit, register, control, formState: { isValid }, reset } = useForm<FormInputs>({
         defaultValues: {
-            
+          pickup_time_min: "00:00",
+          pickup_time_max: "00:00",
+          delivery_time_min: "00:00",
+          delivery_time_max: "00:00",
         }
     });
 
@@ -210,11 +214,11 @@ export const CallForm = () => {
           origin:                data.origin,
           destination:           data.destination,
           pickup_date:           data.pickup_date,
-          pickup_time_min:       data.pickup_time_max,
-          pickup_time_max:       data.pickup_time_min,
+          pickup_time_min:       data.pickup_time_min,
+          pickup_time_max:       data.pickup_time_max,
           delivery_date:         data.delivery_date,
-          delivery_time_min:     data.delivery_time_max,
-          delivery_time_max:     data.delivery_time_min,
+          delivery_time_min:     data.delivery_time_min,
+          delivery_time_max:     data.delivery_time_max,
           weight:                String(data.weight),
           
           final_rate: '',
@@ -491,19 +495,29 @@ export const CallForm = () => {
 
                     <div className="flex flex-col mb-2">
                       <span >Pickup Time Min</span>
-                      <input
-                          type="time"
-                          className="p-2 border rounded-md bg-gray-200"
-                          { ...register('pickup_time_min') }
+                      <Controller
+                        name="pickup_time_min"
+                        control={control}
+                        render={({ field }) => (
+                          <Time
+                            timeInit={field.value}
+                            onChange={(val) => field.onChange(val)}
+                          />
+                        )}
                       />
                     </div>
 
                     <div className="flex flex-col mb-2">
                       <span >Pickup Time Max</span>
-                      <input
-                          type="time"
-                          className="p-2 border rounded-md bg-gray-200"
-                          { ...register('pickup_time_max') }
+                      <Controller
+                        name="pickup_time_max"
+                        control={control}
+                        render={({ field }) => (
+                          <Time
+                            timeInit={field.value}
+                            onChange={(val) => field.onChange(val)}
+                          />
+                        )}
                       />
                     </div>
                   </div>
@@ -531,19 +545,29 @@ export const CallForm = () => {
 
                     <div className="flex flex-col mb-2">
                       <span >Delivery Time Min</span>
-                      <input
-                          type="time"
-                          className="p-2 border rounded-md bg-gray-200"
-                          { ...register('delivery_time_min') }
+                      <Controller
+                        name="delivery_time_min"
+                        control={control}
+                        render={({ field }) => (
+                          <Time
+                            timeInit={field.value}
+                            onChange={(val) => field.onChange(val)}
+                          />
+                        )}
                       />
                     </div>
 
                     <div className="flex flex-col mb-2">
                       <span >Delivery Time Max</span>
-                      <input
-                          type="time"
-                          className="p-2 border rounded-md bg-gray-200"
-                          { ...register('delivery_time_max') }
+                      <Controller
+                        name="delivery_time_max"
+                        control={control}
+                        render={({ field }) => (
+                          <Time
+                            timeInit={field.value}
+                            onChange={(val) => field.onChange(val)}
+                          />
+                        )}
                       />
                     </div>
                   </div>   
