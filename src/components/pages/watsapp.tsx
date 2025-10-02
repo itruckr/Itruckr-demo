@@ -204,8 +204,8 @@ export default function Whatsapp() {
                   }
                 )
               } onClick={() => setSelectedContact(chat)} >
-                <div className="w-12 h-12 bg-green-500 focus:ring-1 focus:ring-green-accent text-white rounded-full mr-3">
-                  <div className="avarar flex justify-center items-center w-full h-full text-xs font-bold ">{ chat.name?.slice(0, 2) }</div> 
+                <div className="w-12 h-12 bg-green-accent focus:ring-1 focus:ring-green-accent text-black rounded-full mr-3">
+                  <div className="avarar flex justify-center items-center w-full h-full text-md font-bold ">{ chat.name?.slice(0, 2) }</div> 
                 </div>
                 <div className="flex-1 text-start">
                   <h2 className="text-sm font-semibold">{ chat.name }</h2>
@@ -234,10 +234,10 @@ export default function Whatsapp() {
                   {/* Incoming Message */}
                   return (
                     <div key={ message.id } className="flex mb-4 cursor-pointer">
-                        <div className="w-9 h-9 rounded-full flex items-center justify-center mr-2 bg-green-500 focus:ring-1 focus:ring-green-accent text-white">
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center mr-2 bg-green-accent focus:ring-1 focus:ring-green-accent text-black">
                             <div className="avarar flex justify-center items-center w-full h-full text-sm font-medium">{ message.senderName?.slice(0, 2) }</div> 
                         </div>
-                        <div className="flex max-w-96 bg-white rounded-lg p-3 gap-3 text-start">
+                        <div className="flex max-w-96 bg-white rounded-lg p-3 gap-3 text-start transition-all duration-200 hover:shadow-md py-3 border border-green-accent">
                             <p className="text-gray-700 text-sm whitespace-pre-wrap">{ message.body }</p>
                         </div>
                     </div>
@@ -252,7 +252,7 @@ export default function Whatsapp() {
                             <p className="whitespace-pre-wrap text-sm">{ message.body }</p>
                         </div>
                         <div className="w-9 h-9 rounded-full flex items-center bg-absolute-black focus:ring-1 focus:ring-green-accent justify-center ml-2">
-                            <div className="avarar flex justify-center items-center w-full h-full text-sm font-medium ">JS</div> 
+                            <div className="avarar flex justify-center items-center text-white w-full h-full text-sm font-medium ">JS</div> 
                         </div>
                     </div>
                   )
