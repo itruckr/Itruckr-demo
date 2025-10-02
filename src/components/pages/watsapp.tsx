@@ -181,7 +181,7 @@ export default function Whatsapp() {
       {/* Sidebar */}
       <div className="w-1/4 bg-white border-r border-gray-300">
         {/* Sidebar Header */}
-        <header className="p-4 border-b border-gray-300 flex justify-between items-center bg-absolute-black focus:ring-1 focus:ring-green-accent text-white">
+        <header className="p-4 border-b border-gray-300 flex justify-between items-center bg-white focus:ring-1 focus:ring-green-accent text-white">
             <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-custom-text-disabled' />
             <Input
                 placeholder='Search conversations...'
@@ -204,12 +204,12 @@ export default function Whatsapp() {
                   }
                 )
               } onClick={() => setSelectedContact(chat)} >
-                <div className="w-12 h-12 bg-absolute-black focus:ring-1 focus:ring-green-accent text-white rounded-full mr-3">
-                  <div className="avarar flex justify-center items-center w-full h-full font-bold ">{ chat.name?.slice(0, 2) }</div> 
+                <div className="w-12 h-12 bg-green-500 focus:ring-1 focus:ring-green-accent text-white rounded-full mr-3">
+                  <div className="avarar flex justify-center items-center w-full h-full text-xs font-bold ">{ chat.name?.slice(0, 2) }</div> 
                 </div>
                 <div className="flex-1 text-start">
-                  <h2 className="text-lg font-semibold">{ chat.name }</h2>
-                  <p className="text-gray-600">{ cutOutWords(chat.messages) }</p>
+                  <h2 className="text-sm font-semibold">{ chat.name }</h2>
+                  <p className="text-sm text-custom-text-secondary">{ cutOutWords(chat.messages) }</p>
                 </div>
               </div>
             ) : null)
@@ -234,11 +234,11 @@ export default function Whatsapp() {
                   {/* Incoming Message */}
                   return (
                     <div key={ message.id } className="flex mb-4 cursor-pointer">
-                        <div className="w-9 h-9 rounded-full flex items-center justify-center mr-2 bg-absolute-black focus:ring-1 focus:ring-green-accent text-white">
-                            <div className="avarar flex justify-center items-center w-full h-full font-bold ">{ message.senderName?.slice(0, 2) }</div> 
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center mr-2 bg-green-500 focus:ring-1 focus:ring-green-accent text-white">
+                            <div className="avarar flex justify-center items-center w-full h-full text-sm font-medium">{ message.senderName?.slice(0, 2) }</div> 
                         </div>
                         <div className="flex max-w-96 bg-white rounded-lg p-3 gap-3 text-start">
-                            <p className="text-gray-700 whitespace-pre-wrap">{ message.body }</p>
+                            <p className="text-gray-700 text-sm whitespace-pre-wrap">{ message.body }</p>
                         </div>
                     </div>
                   )
@@ -249,10 +249,10 @@ export default function Whatsapp() {
                   return (
                     <div key={ message.id } className="flex justify-end mb-4 cursor-pointer">
                         <div className="flex max-w-96 bg-absolute-black focus:ring-1 focus:ring-green-accent text-white text-start rounded-lg p-3 gap-3">
-                            <p className="whitespace-pre-wrap">{ message.body }</p>
+                            <p className="whitespace-pre-wrap text-sm">{ message.body }</p>
                         </div>
-                        <div className="w-9 h-9 rounded-full flex items-center bg-green-accent justify-center ml-2">
-                            <div className="avarar flex justify-center items-center w-full h-full font-bold ">JS</div> 
+                        <div className="w-9 h-9 rounded-full flex items-center bg-absolute-black focus:ring-1 focus:ring-green-accent justify-center ml-2">
+                            <div className="avarar flex justify-center items-center w-full h-full text-sm font-medium ">JS</div> 
                         </div>
                     </div>
                   )
