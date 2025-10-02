@@ -1,10 +1,11 @@
-import { Search } from "lucide-react";
+import { ArrowUp, Search, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Input } from "../ui/input";
 import { WhatsappChat, WhatsappMessage } from "@/types/app";
 import { obtainChats, obtainMessagesByChatId } from "@/api/chatService";
 import clsx from "clsx";
 import { useWebSocket } from "@/contexts/WebSocketContext";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function Whatsapp() {
   //const [menuOpen, setMenuOpen] = useState(false);
@@ -204,9 +205,12 @@ export default function Whatsapp() {
                   }
                 )
               } onClick={() => setSelectedContact(chat)} >
-                <div className="w-12 h-12 bg-green-accent focus:ring-1 focus:ring-green-accent text-black rounded-full mr-3">
-                  <div className="avarar flex justify-center items-center w-full h-full text-md font-bold ">{ chat.name?.slice(0, 2) }</div> 
-                </div>
+                <Avatar className='h-10 w-10 me-2'>
+                  <AvatarImage src={ '' } alt={  chat.name } />
+                  <AvatarFallback className='bg-custom-primary-accent text-black'>
+                    { chat.name?.slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex-1 text-start">
                   <h2 className="text-sm font-semibold">{ chat.name }</h2>
                   <p className="text-sm text-custom-text-secondary">{ cutOutWords(chat.messages) }</p>
@@ -220,9 +224,38 @@ export default function Whatsapp() {
       {/* Main Chat Area */}
       <div className="flex-1 relative">
         {/* Chat Header */}
-        <header className="bg-white p-4 text-gray-700">
-          <h1 className="text-2xl font-semibold">{ selectedContact?.name }</h1>
-        </header>
+        {
+          selectedContact && (
+            <header className="flex gap-2 bg-white p-4 text-gray-700">
+              {/* <h1 className="text-2xl font-semibold">{ selectedContact?.name }</h1> */}
+              <div className='relative'>
+                <Avatar className='h-10 w-10'>
+                  <AvatarImage src={ '' } alt={ selectedContact?.name } />
+                  <AvatarFallback className='bg-custom-primary-accent text-black'>
+                    {selectedContact?.name.slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className='absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-custom-surface' />
+              </div>
+              <div className='flex-1 min-w-0'>
+                <div className='flex items-center justify-between'>
+                  <h3
+                    className={`font-medium truncate text-black`}
+                  >
+                    { selectedContact?.name }
+                  </h3>
+                </div>
+                <div className='flex items-center justify-between'>
+                  <h3
+                    className={`font-medium truncate text-xs text-custom-text-secondary`}
+                  >
+                    Online
+                  </h3>
+                </div>
+              </div>
+            </header>
+          )
+        }
 
         {/* Chat Messages */}
         <div ref={chatContainerRef} className="h-screen overflow-y-auto p-4 pb-60">
@@ -233,13 +266,16 @@ export default function Whatsapp() {
                 if (message.messageFrom === 'user' && message.type === 'text') {
                   {/* Incoming Message */}
                   return (
-                    <div key={ message.id } className="flex mb-4 cursor-pointer">
-                        <div className="w-9 h-9 rounded-full flex items-center justify-center mr-2 bg-green-accent focus:ring-1 focus:ring-green-accent text-black">
-                            <div className="avarar flex justify-center items-center w-full h-full text-sm font-medium">{ message.senderName?.slice(0, 2) }</div> 
+                    <div key={ message.id } className="flex flex-col mb-4 cursor-pointer">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="bg-green-accent p-1 rounded-full">
+                          <User className='w-4 h-4' />
                         </div>
-                        <div className="flex max-w-96 bg-white rounded-lg p-3 gap-3 text-start transition-all duration-200 hover:shadow-md py-3 border border-green-accent">
-                            <p className="text-gray-700 text-sm whitespace-pre-wrap">{ message.body }</p>
-                        </div>
+                        <span className='text-absolute-black text-sm'>{message.senderName}</span>
+                      </div>
+                      <div className="flex max-w-96 bg-white rounded-lg p-3 gap-3 text-start transition-all duration-200 hover:shadow-md py-3 border border-green-accent">
+                          <p className="text-gray-700 text-sm whitespace-pre-wrap">{ message.body }</p>
+                      </div>
                     </div>
                   )
                 } 
@@ -247,12 +283,15 @@ export default function Whatsapp() {
                 if ( (message.messageFrom === 'dispatcher-human' || message.messageFrom === 'assistant' || message.messageFrom === 'admin') && message.type === 'text' ){
                   {/* Outgoing Message */}
                   return (
-                    <div key={ message.id } className="flex justify-end mb-4 cursor-pointer">
-                        <div className="flex max-w-96 bg-absolute-black focus:ring-1 focus:ring-green-accent text-white text-start rounded-lg p-3 gap-3">
-                            <p className="whitespace-pre-wrap text-sm">{ message.body }</p>
+                    <div key={ message.id } className="flex flex-col items-end mb-4 cursor-pointer">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className='text-absolute-black text-sm'>{message.senderName}</span>
+                          <div className="bg-absolute-black p-1 rounded-full">
+                            <User className='w-4 h-4 text-green-500' />
+                          </div>
                         </div>
-                        <div className="w-9 h-9 rounded-full flex items-center bg-absolute-black focus:ring-1 focus:ring-green-accent justify-center ml-2">
-                            <div className="avarar flex justify-center items-center text-white w-full h-full text-sm font-medium ">JS</div> 
+                        <div className="flex max-w-96 bg-absolute-black focus:ring-1 focus:ring-green-accent transition-all duration-200 hover:shadow-md text-white text-start rounded-lg p-3 gap-3">
+                            <p className="whitespace-pre-wrap text-sm">{ message.body }</p>
                         </div>
                     </div>
                   )
@@ -264,21 +303,25 @@ export default function Whatsapp() {
         </div>
 
         {/* Chat Input */}
-        <footer className="w-full bg-white border-t border-gray-300 p-4 absolute bottom-0">
-          <div className="flex items-center">
-            <input
-              type="text"
-              value={ messageText }
-              onChange={e => setMessageText(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Type a message..."
-              className="w-full p-2 rounded-md border border-gray-400 focus:outline-none focus:border-blue-500"
-            />
-            <button onClick={ handleSendMessage } className="bg-absolute-black focus:ring-1 focus:ring-green-accent text-white px-4 py-2 rounded-md ml-2">
-              Send
-            </button>
-          </div>
-        </footer>
+        {
+          selectedContact && (
+            <footer className="w-full bg-white border-t border-gray-300 p-4 absolute bottom-0">
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  value={ messageText }
+                  onChange={e => setMessageText(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
+                  placeholder="Type a message..."
+                  className="w-full p-2 rounded-md border border-gray-400 focus:outline-none focus:border-blue-500"
+                />
+                <button onClick={ handleSendMessage } className="bg-green-accent focus:ring-1 focus:ring-green-accent px-4 py-2 rounded-md ml-2">
+                  <ArrowUp className='w-4 h-4' />
+                </button>
+              </div>
+            </footer>
+          )
+        }
       </div>
     </div>
   );
