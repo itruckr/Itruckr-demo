@@ -336,262 +336,263 @@ export const CallForm = () => {
 
   return (
     <>
-      <UploadFile
-        label="Search data"
-        handleFileChange={ handleFileChange }
-      />
-      
       {
         loading === "create" && (
-          <form onSubmit={ handleSubmit( onSubmit ) } className="grid grid-cols-1 gap-5">
+          <>
+            <UploadFile
+              label="Search data"
+              handleFileChange={ handleFileChange }
+            />
+            <form onSubmit={ handleSubmit( onSubmit ) } className="grid grid-cols-1 gap-5">
 
-            <CollapseList title="General info" isOpenInit={ true } >
-              <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
-                <div className="flex flex-col mb-2">
-                  <span>Broker phone</span>
-                  <input
-                      type="text"
-                      className="p-2 border rounded-md bg-gray-200"
-                      autoFocus
-                      { ...register('to_number', { required: true }) }
-                  />
-                </div>
-          
-                <div className="flex flex-col mb-2">
-                  <span>Dispatcher</span>
-                  <select
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('dispatcher', { required: true }) }
-                  >
-                    <option value="">[ Seleccione ]</option>
-                    
-                    {
-                      dispatchers.map((dispacht) => (
-                        <option key={ dispacht.id } value={ dispacht.id }>{ dispacht.firstName } {dispacht.lastName}</option>
-                      ))
-                    }
-                  </select>
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span>Company</span>
-                  <select
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('company', { required: true }) }
-                  >
-                      <option value="">[ Seleccione ]</option>
-                      
-                      {
-                        authorities.map((company) => (
-                          <option key={ company.id } value={ company.id }>{ company.name }</option>
-                        ))
-                      }
-                  </select>
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span>Driver</span>
-                  <select
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('driver', { required: true }) }
-                  >
-                    <option value="">[ Seleccione ]</option>
-                    
-                    {
-                      Drivers.map((drvier) => (
-                        <option key={ drvier.id } value={ drvier.id }>{ drvier.firstName } { drvier.lastName }</option>
-                      ))
-                    }
-                  </select>
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span>Vehicle</span>
-                  <select
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('vehicle', { required: true }) }
-                  >
-                      <option value="">[ Seleccione ]</option>
-                      {
-                        vehicles.map((vehicle) => (
-                          <option key={ vehicle.id } value={ vehicle.id }>{ vehicle.id }</option>
-                        ))
-                      }
-                  </select>
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span>Trailer</span>
-                  <select
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('trailer', { required: true }) }
-                  >
-                      <option value="">[ Seleccione ]</option>
-                      {
-                        trailers.map((trailer) => (
-                          <option key={ trailer.id } value={ trailer.id }>{ trailer.unit }</option>
-                        ))
-                      }
-                  </select>
-                </div>
-              </div>
-            </CollapseList>
-
-            <CollapseList title="Load info" isOpen={ isOpenDAT } onToggle={ () => setisOpenDAT(!isOpenDAT) } >
-              <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
-                <div className="flex flex-col mb-2">
-                  <span >Load Number</span>
-                  <input
-                      type="text"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('load_number') }
-                  />
-                </div>
-                <div className="flex flex-col mb-2">
-                  <span >Weight</span>
-                  <input
-                      type="text"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('weight', { required: true }) }
-                  />
-                </div>
-
-                <div className="flex flex-col mb-2">
-                  <span >Offer</span>
-                  <input
-                      type="text"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('broker_offer', { required: true }) }
-                  />
-                </div>
-              </div> 
-
-              <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 my-3">
-
-                <div className="flex flex-col gap-5 bg-gray-100 rounded-lg shadow-md p-5">
-                  <div className="flex p-2 justify-start">
-                    <h2 className="font-bold">Pick up</h2>
-                  </div>
+              <CollapseList title="General info" isOpenInit={ true } >
+                <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
                   <div className="flex flex-col mb-2">
-                    <span >Origin</span>
+                    <span>Broker phone</span>
                     <input
                         type="text"
                         className="p-2 border rounded-md bg-gray-200"
-                        { ...register('origin', { required: true }) }
+                        autoFocus
+                        { ...register('to_number', { required: true }) }
                     />
                   </div>
+            
                   <div className="flex flex-col mb-2">
-                    <span >Pickup Date</span>
-                    <input
-                        type="date"
+                    <span>Dispatcher</span>
+                    <select
                         className="p-2 border rounded-md bg-gray-200"
-                        { ...register('pickup_date') }
-                    />
+                        { ...register('dispatcher', { required: true }) }
+                    >
+                      <option value="">[ Seleccione ]</option>
+                      
+                      {
+                        dispatchers.map((dispacht) => (
+                          <option key={ dispacht.id } value={ dispacht.id }>{ dispacht.firstName } {dispacht.lastName}</option>
+                        ))
+                      }
+                    </select>
                   </div>
 
                   <div className="flex flex-col mb-2">
-                    <span >Pickup Time Min</span>
-                    <input
-                        type="time"
+                    <span>Company</span>
+                    <select
                         className="p-2 border rounded-md bg-gray-200"
-                        { ...register('pickup_time_min') }
-                    />
+                        { ...register('company', { required: true }) }
+                    >
+                        <option value="">[ Seleccione ]</option>
+                        
+                        {
+                          authorities.map((company) => (
+                            <option key={ company.id } value={ company.id }>{ company.name }</option>
+                          ))
+                        }
+                    </select>
                   </div>
 
                   <div className="flex flex-col mb-2">
-                    <span >Pickup Time Max</span>
-                    <input
-                        type="time"
+                    <span>Driver</span>
+                    <select
                         className="p-2 border rounded-md bg-gray-200"
-                        { ...register('pickup_time_max') }
-                    />
+                        { ...register('driver', { required: true }) }
+                    >
+                      <option value="">[ Seleccione ]</option>
+                      
+                      {
+                        Drivers.map((drvier) => (
+                          <option key={ drvier.id } value={ drvier.id }>{ drvier.firstName } { drvier.lastName }</option>
+                        ))
+                      }
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col mb-2">
+                    <span>Vehicle</span>
+                    <select
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('vehicle', { required: true }) }
+                    >
+                        <option value="">[ Seleccione ]</option>
+                        {
+                          vehicles.map((vehicle) => (
+                            <option key={ vehicle.id } value={ vehicle.id }>{ vehicle.id }</option>
+                          ))
+                        }
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col mb-2">
+                    <span>Trailer</span>
+                    <select
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('trailer', { required: true }) }
+                    >
+                        <option value="">[ Seleccione ]</option>
+                        {
+                          trailers.map((trailer) => (
+                            <option key={ trailer.id } value={ trailer.id }>{ trailer.unit }</option>
+                          ))
+                        }
+                    </select>
                   </div>
                 </div>
+              </CollapseList>
 
-                <div className="flex flex-col gap-5 bg-gray-100 rounded-lg shadow-md p-5">
-                  <div className="flex p-2 justify-start">
-                    <h2 className="font-bold">Delivery</h2>
+              <CollapseList title="Load info" isOpen={ isOpenDAT } onToggle={ () => setisOpenDAT(!isOpenDAT) } >
+                <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
+                  <div className="flex flex-col mb-2">
+                    <span >Load Number</span>
+                    <input
+                        type="text"
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('load_number') }
+                    />
                   </div>
                   <div className="flex flex-col mb-2">
-                      <span >Destination</span>
+                    <span >Weight</span>
+                    <input
+                        type="text"
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('weight', { required: true }) }
+                    />
+                  </div>
+
+                  <div className="flex flex-col mb-2">
+                    <span >Offer</span>
+                    <input
+                        type="text"
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('broker_offer', { required: true }) }
+                    />
+                  </div>
+                </div> 
+
+                <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 my-3">
+
+                  <div className="flex flex-col gap-5 bg-gray-100 rounded-lg shadow-md p-5">
+                    <div className="flex p-2 justify-start">
+                      <h2 className="font-bold">Pick up</h2>
+                    </div>
+                    <div className="flex flex-col mb-2">
+                      <span >Origin</span>
                       <input
                           type="text"
-                          className="p-2 border rounded-md  bg-gray-200"
-                          { ...register('destination', { required: true }) }
+                          className="p-2 border rounded-md bg-gray-200"
+                          { ...register('origin', { required: true }) }
                       />
                     </div>
                     <div className="flex flex-col mb-2">
-                    <span >Delivery Date</span>
-                    <input
-                        type="date"
-                        className="p-2 border rounded-md bg-gray-200"
-                        { ...register('delivery_date') }
-                    />
+                      <span >Pickup Date</span>
+                      <input
+                          type="date"
+                          className="p-2 border rounded-md bg-gray-200"
+                          { ...register('pickup_date') }
+                      />
+                    </div>
+
+                    <div className="flex flex-col mb-2">
+                      <span >Pickup Time Min</span>
+                      <input
+                          type="time"
+                          className="p-2 border rounded-md bg-gray-200"
+                          { ...register('pickup_time_min') }
+                      />
+                    </div>
+
+                    <div className="flex flex-col mb-2">
+                      <span >Pickup Time Max</span>
+                      <input
+                          type="time"
+                          className="p-2 border rounded-md bg-gray-200"
+                          { ...register('pickup_time_max') }
+                      />
+                    </div>
                   </div>
 
-                  <div className="flex flex-col mb-2">
-                    <span >Delivery Time Min</span>
-                    <input
-                        type="time"
-                        className="p-2 border rounded-md bg-gray-200"
-                        { ...register('delivery_time_min') }
-                    />
-                  </div>
+                  <div className="flex flex-col gap-5 bg-gray-100 rounded-lg shadow-md p-5">
+                    <div className="flex p-2 justify-start">
+                      <h2 className="font-bold">Delivery</h2>
+                    </div>
+                    <div className="flex flex-col mb-2">
+                        <span >Destination</span>
+                        <input
+                            type="text"
+                            className="p-2 border rounded-md  bg-gray-200"
+                            { ...register('destination', { required: true }) }
+                        />
+                      </div>
+                      <div className="flex flex-col mb-2">
+                      <span >Delivery Date</span>
+                      <input
+                          type="date"
+                          className="p-2 border rounded-md bg-gray-200"
+                          { ...register('delivery_date') }
+                      />
+                    </div>
 
-                  <div className="flex flex-col mb-2">
-                    <span >Delivery Time Max</span>
-                    <input
-                        type="time"
-                        className="p-2 border rounded-md bg-gray-200"
-                        { ...register('delivery_time_max') }
-                    />
-                  </div>
-                </div>   
-              
+                    <div className="flex flex-col mb-2">
+                      <span >Delivery Time Min</span>
+                      <input
+                          type="time"
+                          className="p-2 border rounded-md bg-gray-200"
+                          { ...register('delivery_time_min') }
+                      />
+                    </div>
+
+                    <div className="flex flex-col mb-2">
+                      <span >Delivery Time Max</span>
+                      <input
+                          type="time"
+                          className="p-2 border rounded-md bg-gray-200"
+                          { ...register('delivery_time_max') }
+                      />
+                    </div>
+                  </div>   
+                
+                </div>
+              </CollapseList>
+
+              <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
+                <div className="flex flex-col mb-2">
+                  <span>Expected rate</span>
+                  <input
+                      type="text"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('proposed_rate') }
+                  />
+                </div>
+
+
+                <div className="flex flex-col mb-2">
+                  <span>Minimum rate</span>
+                  <input
+                      type="text"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('proposed_rate_minimum') }
+                  />
+                </div>
               </div>
-            </CollapseList>
 
-            <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
-              <div className="flex flex-col mb-2">
-                <span>Expected rate</span>
-                <input
-                    type="text"
-                    className="p-2 border rounded-md bg-gray-200"
-                    { ...register('proposed_rate') }
-                />
+              <div className="flex flex-col mb-2 sm:mt-2">
+                <div className="flex flex-auto">
+                  <button
+                      disabled={ !isValid }
+                      type='submit'
+                      className={
+                          clsx(
+                              "flex w-full sm:w-1/2 justify-center ",
+                              {
+                                  'btn-primary': isValid,
+                                  'btn-disabled': !isValid
+                              }
+                          )
+                      }>
+                      Submit
+                  </button>
+                </div>
               </div>
 
-
-              <div className="flex flex-col mb-2">
-                <span>Minimum rate</span>
-                <input
-                    type="text"
-                    className="p-2 border rounded-md bg-gray-200"
-                    { ...register('proposed_rate_minimum') }
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col mb-2 sm:mt-2">
-              <div className="flex flex-auto">
-                <button
-                    disabled={ !isValid }
-                    type='submit'
-                    className={
-                        clsx(
-                            "flex w-full sm:w-1/2 justify-center ",
-                            {
-                                'btn-primary': isValid,
-                                'btn-disabled': !isValid
-                            }
-                        )
-                    }>
-                    Submit
-                </button>
-              </div>
-            </div>
-
-          </form>
+            </form>
+          </>
         )
       }
 
