@@ -4,11 +4,11 @@ import axios from "axios";
 const registration = import.meta.env["VITE_REGISTRATION_SVC"];
 
 
-export const obtainVehicle = async (
+export const obtainAuthority = async (
   accessToken: string,
 ) => {
   try {
-    const url = `${registration}/vehicle/all`;
+    const url = `${registration}/authority/all`;
 
     const { data } = await axios.get(url, {
       headers: { "Authorization": `Bearer ${ accessToken }` },

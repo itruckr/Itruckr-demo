@@ -4,8 +4,8 @@ import SucessFull from "../ui/animation/Sucessfull";
 import Headphone from "../ui/animation/Headphone";
 import { useEffect, useState } from "react";
 import { ErrorAnimated } from "../ui/animation/ErrorAnimated";
-import { datExtractorSingleLoad, obtainDispatcher, obtainDriver, obtainTrailer, obtainVehicle, outBoundCall } from "@/api";
-import { Dispatcher, DriverForm as Driver, Vehicule, Trailer } from '@/types/app';
+import { datExtractorSingleLoad, obtainAuthority, obtainDispatcher, obtainDriver, obtainTrailer, outBoundCall } from "@/api";
+import { Dispatcher, DriverForm as Driver, Vehicule, Trailer, Authority } from '@/types/app';
 import { LoadingScreen } from "../ui/animation/loadingScreen";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { UploadFile } from '../ui/uploadFile';
@@ -56,33 +56,6 @@ type FormInputs = {
 
 type LoadingState = "create" | "loading" | "loading_call" | "success" | "error" | "info";
 
-const authorities = [
-  {
-    id: 1,
-    name: 'ITR APP',
-    email: 'info.itrapp@gmail.com	',
-    mcNumber: '1582744'
-  },
-  {
-    id: 2,
-    name: 'VIZU LOGISTICS SOLUTIONS	',
-    email: 'vizulogisticssolutions@gmail.com',
-    mcNumber: '1130788'
-  },
-  {
-    id: 3,
-    name: 'MOLA S TRANSPORT',
-    email: 'molastransport@gmail.com',
-    mcNumber: '125039'
-  },
-  {
-    id: 4,
-    name: 'TECH TRUCK INC',
-    email: 'techtruck49gmail.com',
-    mcNumber: '1713895'
-  }
-]
-
 export const CallForm = () => {
 
   const { messages } = useWebSocket();
@@ -90,6 +63,7 @@ export const CallForm = () => {
   const [dispatchers, setDisparchers] = useState<Dispatcher[]>([]);
   const [Drivers, setDrivers] = useState<Driver[]>([]);
   const [vehicles, setVehicles] = useState<Vehicule[]>([]);
+  const [authority, setAuthority] = useState<Authority[]>([]);
   const [trailers, setTrailers] = useState<Trailer[]>([]);
   const [lastData, setLastData] = useState<any | null>(null);
   const [audioUrl, setAudioUrl] = useState<any | null>(null);
@@ -114,8 +88,8 @@ export const CallForm = () => {
     return result
   }
 
-  const allVehicle = async (accessToken: string): Promise<Vehicule[]> => {
-    const result = await obtainVehicle(accessToken);
+  const allAuthority = async (accessToken: string): Promise<Authority[]> => {
+    const result = await obtainAuthority(accessToken);
     return result
   }
 
@@ -133,7 +107,7 @@ export const CallForm = () => {
         const parsedData = JSON.parse(cachedData);
         setDisparchers(parsedData.dispatchers);
         setDrivers(parsedData.drivers);
-        setVehicles(parsedData.vehicles);
+        setAuthority(parsedData.authority);
         setTrailers(parsedData.trailers);
         setLoading('create');
         return;
@@ -144,23 +118,23 @@ export const CallForm = () => {
         const accessToken = localStorage.getItem("auth_token");
         if (!accessToken) throw new Error('Token vacío');
 
-        const [dispatchers, drivers, vehicles, trailers] = await Promise.all([
+        const [dispatchers, drivers, authority, trailers] = await Promise.all([
           allDispatcher(accessToken),
           allDriver(accessToken),
-          allVehicle(accessToken),
+          allAuthority(accessToken),
           allTrailer(accessToken)
         ]);
 
         const filteredData = {
           dispatchers: dispatchers.filter(element => element.active),
           drivers: drivers.filter(element => element.active),
-          vehicles: vehicles.filter(element => element.active),
+          authority: authority,
           trailers: trailers.filter(element => element.active)
         };
 
         setDisparchers(filteredData.dispatchers);
         setDrivers(filteredData.drivers);
-        setVehicles(filteredData.vehicles);
+        setAuthority(filteredData.authority);
         setTrailers(filteredData.trailers);
         setLoading('create');
         
@@ -201,7 +175,7 @@ export const CallForm = () => {
   const onSubmit = async ( data: FormInputs ) => {
     setLoading('loading_call');
 
-    const company = authorities.find((element) => element.id === Number(data.company));
+    const company = authority.find((element) => element.authorityId === Number(data.company));
     const driver = Drivers.find((element) => element.id === data.driver);
     const dispatcher = dispatchers.find((element) => element.id === data.dispatcher);
     const vehicle = vehicles.find((element) => element.id === Number(data.vehicle));
@@ -337,6 +311,13 @@ export const CallForm = () => {
     }
   }, []);
 
+  const handleCompanyChange = (id: string) => {
+    const selectedAuthority = authority.find((element) => element.authorityId === Number(id));
+    if (selectedAuthority) {
+      setVehicles(selectedAuthority.vehicles);
+    }
+  };
+
 
   return (
     <>
@@ -382,12 +363,16 @@ export const CallForm = () => {
                     <select
                         className="p-2 border rounded-md bg-gray-200"
                         { ...register('company', { required: true }) }
+                        onChange={(e) => {
+                          const selectedId = e.target.value;
+                          handleCompanyChange(selectedId);
+                        }}
                     >
                         <option value="">[ Seleccione ]</option>
                         
                         {
-                          authorities.map((company) => (
-                            <option key={ company.id } value={ company.id }>{ company.name }</option>
+                          authority.map((company) => (
+                            <option key={ company.authorityId } value={ company.authorityId }>{ company.name }</option>
                           ))
                         }
                     </select>

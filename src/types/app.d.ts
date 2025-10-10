@@ -612,6 +612,14 @@ export interface Association {
     active:          boolean;
 }
 
+export interface Authority {
+  authorityId: number,
+  name: string,
+  email: string,
+  mcNumber: string,
+  vehicles: Vehicle[]
+}
+
 export interface Vehicule {
     id:        number;
     plate:     string;
@@ -621,7 +629,14 @@ export interface Vehicule {
     model:     string;
     companyId: string;
     active:    boolean;
+    authorityId?: number,
+    trailerType?: string,
+    equipment?:  Equipment = {};
 }
+
+type Equipment = {
+  [key: string]: any; // cualquier valor
+} | null;
 
 export class Trailer {
     id: number;
