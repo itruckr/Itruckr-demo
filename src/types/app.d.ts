@@ -617,7 +617,9 @@ export interface Authority {
   name: string,
   email: string,
   mcNumber: string,
-  vehicles: Vehicle[]
+  vehicles: Vehicle[],
+  drivers: DriverForm[],
+  dispatchers: Dispatcher[]
 }
 
 export interface Vehicule {
@@ -677,6 +679,7 @@ export interface DynamicVariables {
   load_number: string;
 
   broker_offer: string;
+  extension: string;
 
   truck_number: string;
   trailer_number: string;

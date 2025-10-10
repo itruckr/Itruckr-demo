@@ -4,7 +4,7 @@ import SucessFull from "../ui/animation/Sucessfull";
 import Headphone from "../ui/animation/Headphone";
 import { useEffect, useState } from "react";
 import { ErrorAnimated } from "../ui/animation/ErrorAnimated";
-import { datExtractorSingleLoad, obtainAuthority, obtainDispatcher, obtainDriver, obtainTrailer, outBoundCall } from "@/api";
+import { datExtractorSingleLoad, obtainAuthority, obtainTrailer, outBoundCall } from "@/api";
 import { Dispatcher, DriverForm as Driver, Vehicule, Trailer, Authority } from '@/types/app';
 import { LoadingScreen } from "../ui/animation/loadingScreen";
 import { useWebSocket } from "@/contexts/WebSocketContext";
@@ -33,6 +33,7 @@ type FormInputs = {
   load_number: string;
   to_number: string;
   broker_offer: string,
+  extension: string,
 
   // business
   proposed_rate: string,
@@ -78,16 +79,6 @@ export const CallForm = () => {
         }
     });
 
-  const allDispatcher = async (accessToken: string): Promise<Dispatcher[]> => {
-    const result = await obtainDispatcher(accessToken);
-    return result
-  }
-
-  const allDriver = async (accessToken: string): Promise<Driver[]> => {
-    const result = await obtainDriver(accessToken);
-    return result
-  }
-
   const allAuthority = async (accessToken: string): Promise<Authority[]> => {
     const result = await obtainAuthority(accessToken);
     return result
@@ -105,8 +96,6 @@ export const CallForm = () => {
 
       if (cachedData) {
         const parsedData = JSON.parse(cachedData);
-        setDisparchers(parsedData.dispatchers);
-        setDrivers(parsedData.drivers);
         setAuthority(parsedData.authority);
         setTrailers(parsedData.trailers);
         setLoading('create');
@@ -118,22 +107,16 @@ export const CallForm = () => {
         const accessToken = localStorage.getItem("auth_token");
         if (!accessToken) throw new Error('Token vacío');
 
-        const [dispatchers, drivers, authority, trailers] = await Promise.all([
-          allDispatcher(accessToken),
-          allDriver(accessToken),
+        const [authority, trailers] = await Promise.all([
           allAuthority(accessToken),
           allTrailer(accessToken)
         ]);
 
         const filteredData = {
-          dispatchers: dispatchers.filter(element => element.active),
-          drivers: drivers.filter(element => element.active),
           authority: authority,
           trailers: trailers.filter(element => element.active)
         };
 
-        setDisparchers(filteredData.dispatchers);
-        setDrivers(filteredData.drivers);
         setAuthority(filteredData.authority);
         setTrailers(filteredData.trailers);
         setLoading('create');
@@ -198,6 +181,7 @@ export const CallForm = () => {
           final_rate: '',
           load_number:           data.load_number,
           broker_offer:           data.broker_offer,
+          extension:            data.extension,
 
           //proposed
           proposed_rate:         data.proposed_rate,
@@ -215,7 +199,7 @@ export const CallForm = () => {
           // trailer
           truck_number:          String(vehicle?.id),
           trailer_number:        trailer?.unit ?? '',
-          truck_specs:           '[{"type":"straps","status":"available"},{"type":"refrigeration/temp control","status":"not available"},{"type":"extra stops","status":"available"}]',
+          truck_specs:           JSON.stringify(vehicle?.equipment ?? {}),
 
           // dispatcher
           dispatcher_name:       `${dispatcher?.firstName} ${dispatcher?.lastName}`,
@@ -289,6 +273,7 @@ export const CallForm = () => {
     
     reset({
       to_number: company.contact_phone,
+      extension: company.number_extension,
       origin: `${origin.city} ${origin.state}`,
       pickup_date: origin.pickup_date,
       pickup_time_min: toInputTime(origin.pickup_time_window_start),
@@ -315,6 +300,8 @@ export const CallForm = () => {
     const selectedAuthority = authority.find((element) => element.authorityId === Number(id));
     if (selectedAuthority) {
       setVehicles(selectedAuthority.vehicles);
+      setDisparchers(selectedAuthority.dispatchers);
+      setDrivers(selectedAuthority.drivers);
     }
   };
 
@@ -341,21 +328,15 @@ export const CallForm = () => {
                         { ...register('to_number', { required: true }) }
                     />
                   </div>
-            
+
                   <div className="flex flex-col mb-2">
-                    <span>Dispatcher</span>
-                    <select
+                    <span>Number ext.</span>
+                    <input
+                        type="text"
                         className="p-2 border rounded-md bg-gray-200"
-                        { ...register('dispatcher', { required: true }) }
-                    >
-                      <option value="">[ Seleccione ]</option>
-                      
-                      {
-                        dispatchers.map((dispacht) => (
-                          <option key={ dispacht.id } value={ dispacht.id }>{ dispacht.firstName } {dispacht.lastName}</option>
-                        ))
-                      }
-                    </select>
+                        autoFocus
+                        { ...register('extension') }
+                    />
                   </div>
 
                   <div className="flex flex-col mb-2">
@@ -375,6 +356,22 @@ export const CallForm = () => {
                             <option key={ company.authorityId } value={ company.authorityId }>{ company.name }</option>
                           ))
                         }
+                    </select>
+                  </div>
+            
+                  <div className="flex flex-col mb-2">
+                    <span>Dispatcher</span>
+                    <select
+                        className="p-2 border rounded-md bg-gray-200"
+                        { ...register('dispatcher', { required: true }) }
+                    >
+                      <option value="">[ Seleccione ]</option>
+                      
+                      {
+                        dispatchers.map((dispacht) => (
+                          <option key={ dispacht.id } value={ dispacht.id }>{ dispacht.firstName } {dispacht.lastName}</option>
+                        ))
+                      }
                     </select>
                   </div>
 
