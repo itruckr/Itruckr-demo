@@ -99,15 +99,15 @@ export const CallForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       
-      const cachedData = localStorage.getItem('appDataCache');
+      //const cachedData = localStorage.getItem('appDataCache');
 
-      if (cachedData) {
+      /*if (cachedData) {
         const parsedData = JSON.parse(cachedData);
         setAuthority(parsedData.authority);
         setTrailers(parsedData.trailers);
         setLoading('create');
         return;
-      }
+      }*/
 
       setLoading('loading');
       try {
