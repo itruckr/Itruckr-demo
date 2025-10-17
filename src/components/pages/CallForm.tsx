@@ -230,12 +230,12 @@ export const CallForm = () => {
           destination:           data.destination,
           pickup_date_min:       data.pickup_date_min,
           pickup_date_max:       data.pickup_date_max,
-          pickup_time_min:       data.pickup_time_min,
-          pickup_time_max:       data.pickup_time_max,
+          pickup_time_min:       normalizeHour(data.pickup_time_min),
+          pickup_time_max:       normalizeHour(data.pickup_time_max),
           delivery_date_min:     data.delivery_date_min,
           delivery_date_max:     data.delivery_date_max,
-          delivery_time_min:     data.delivery_time_min,
-          delivery_time_max:     data.delivery_time_max,
+          delivery_time_min:     normalizeHour(data.delivery_time_min),
+          delivery_time_max:     normalizeHour(data.delivery_time_max),
           weight:                String(data.weight),
           
           final_rate: '',
@@ -275,6 +275,10 @@ export const CallForm = () => {
     }
     
   }
+
+  const normalizeHour = (time: string): string => {
+    return time.replace(/^0(\d:)/, '$1');
+  };
 
   const resetForm = () => {
     reset();
