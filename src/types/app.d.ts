@@ -658,34 +658,50 @@ export interface ConversationInitiationClientData {
 }
 
 export interface DynamicVariables {
-  dispatcher_name: string;
+  // broker
+  broker_offer: string;
+  extension?: string;
+
+  // company
   company_name: string;
   mc_number: string;
   company_email: string;
 
+  // driver
+  driver_name: string;
+  driver_phone: string;
+
+  // dispatcher
+  dispatcher_name: string;
+
+  // trailer
+  truck_number: string;
+  truck_specs: string;
+  trailer_number: string;
+
+  // load
   origin: string;
   destination: string;
-  pickup_date: string;
+  weight: string;
+  load_number?: string | null;
+
+  // pickup
+  pickup_date_min: string;
+  pickup_date_max: string;
   pickup_time_min: string;
   pickup_time_max: string;
-  delivery_date: string;
+
+  // delivery
+  delivery_date_min: string;
+  delivery_date_max: string;
   delivery_time_min: string;
   delivery_time_max: string;
-  weight: string;
-  truck_specs: string;
-  proposed_rate: string;
-  proposed_rate_minimum: string;
+
+  // general data
+  proposed_rate: number;
+  proposed_rate_minimum: number;
+  counter_rate: number;
   final_rate: string;
-  load_number: string;
-
-  broker_offer: string;
-  extension: string;
-
-  truck_number: string;
-  trailer_number: string;
-  
-  driver_phone: string;
-  driver_name: string;
 }
 
 export interface WhatsappChat {
@@ -723,4 +739,20 @@ export interface WhatsappMessage {
   isBundle: boolean;
   status: string;
   questionNumber: number;
+}
+
+export interface RequestEmail {
+  to: string;
+  cc: string | null;
+  bbc: string | null; // 👈 ¿seguro que querías "bbc"? Lo normal es "bcc" (blind carbon copy)
+  subject: string;
+  text: string;
+  attachments: any[]; // o puedes especificar el tipo exacto si sabes qué estructura tiene
+}
+
+export interface EmailPayload {
+  requestEmail: RequestEmail;
+  username: string;
+  password: string;
+  personal: string;
 }

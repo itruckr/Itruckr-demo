@@ -4,7 +4,7 @@ import SucessFull from "../ui/animation/Sucessfull";
 import Headphone from "../ui/animation/Headphone";
 import { useEffect, useState } from "react";
 import { ErrorAnimated } from "../ui/animation/ErrorAnimated";
-import { datExtractorSingleLoad, obtainAuthority, obtainTrailer, outBoundCall } from "@/api";
+import { datExtractorSingleLoad, obtainAuthority, obtainTrailer, outBoundCall, } from "@/api";
 import { Dispatcher, DriverForm as Driver, Vehicule, Trailer, Authority } from '@/types/app';
 import { LoadingScreen } from "../ui/animation/loadingScreen";
 import { useWebSocket } from "@/contexts/WebSocketContext";
@@ -21,24 +21,35 @@ declare global {
 }
 
 type FormInputs = {
-  origin: string;
-  destination: string;
-  pickup_date: string;
-  pickup_time_min:       string,
-  pickup_time_max:       string,
-  delivery_date: string;
-  delivery_time_min:      string,
-  delivery_time_max:      string,
-  weight: number;
-  load_number: string;
-  to_number: string;
   broker_offer: string,
   extension: string,
 
+  origin: string;
+  destination: string;
+  
+  
+  weight: number;
+  load_number: string;
+  to_number: string;
+ 
+  //email: string,
+
+  //pickup
+  pickup_date: string;
+  pickup_date_min: string;
+  pickup_date_max: string;
+  pickup_time_min: string;
+  pickup_time_max: string;
+
+  //delivery
+  delivery_date_min: string;
+  delivery_date_max: string;
+  delivery_time_min: string;
+  delivery_time_max: string;
+
   // business
-  proposed_rate: string,
-  proposed_rate_minimum: string,
-  //final_rate: string,
+  proposed_rate: number,
+  proposed_rate_minimum: number,
 
   // truck
   vehicle: string;
@@ -72,10 +83,6 @@ export const CallForm = () => {
   const [copied, setCopied] = useState(false);
   const { handleSubmit, register, control, formState: { isValid }, reset } = useForm<FormInputs>({
         defaultValues: {
-          pickup_time_min: "00:00",
-          pickup_time_max: "00:00",
-          delivery_time_min: "00:00",
-          delivery_time_max: "00:00",
         }
     });
 
@@ -154,8 +161,54 @@ export const CallForm = () => {
       }
     }
   }, [messages]);
+
+  //region email
+  /*const email = watch("email");
+  const company = watch("company");
+
+  const handleSendEmail = async () => {
+    if (!isValid) {
+      alert("El formulario no es válido");
+      return;
+    }
+
+    if (!email) {
+      alert("Debe ingresar un correo electrónico para enviar el email");
+      return;
+    }
+
+    if (company !== "3") {
+      alert("Solo se permite enviar correos si la empresa es 'MOLA S TRANSPORT'");
+      return;
+    }
+
+
+    const data: EmailPayload = {
+      requestEmail: {
+        to: email,
+        cc: null,
+        bbc: null,
+        subject: "esto es una prueba",
+        text: "hola que mas ???????????",
+        attachments: [],
+      },
+      username: "molastransport@gmail.com",
+      password: "idlpmgwhbokctrfy",
+      personal: "test Email",
+    };
+
+    await sendEmailDynamic(data);
+    // Aquí tu lógica para enviar el correo
+    alert("Correo enviado correctamente ✅");
+  };*/
+  //endregion email
   
   const onSubmit = async ( data: FormInputs ) => {
+    if (!isValid) return;
+    if (data.proposed_rate < data.proposed_rate_minimum) {
+      alert(`Proposed rate (${data.proposed_rate}) debe ser mayor o igual al rate mínimo (${data.proposed_rate_minimum})`);
+      return;
+    }
     setLoading('loading_call');
 
     const company = authority.find((element) => element.authorityId === Number(data.company));
@@ -170,22 +223,25 @@ export const CallForm = () => {
         dynamic_variables: {
           origin:                data.origin,
           destination:           data.destination,
-          pickup_date:           data.pickup_date,
+          pickup_date_min:       data.pickup_date_min,
+          pickup_date_max:       data.pickup_date_max,
           pickup_time_min:       data.pickup_time_min,
           pickup_time_max:       data.pickup_time_max,
-          delivery_date:         data.delivery_date,
+          delivery_date_min:     data.delivery_date_min,
+          delivery_date_max:     data.delivery_date_max,
           delivery_time_min:     data.delivery_time_min,
           delivery_time_max:     data.delivery_time_max,
           weight:                String(data.weight),
           
           final_rate: '',
-          load_number:           data.load_number,
+          load_number:           (!data.load_number || isNaN(Number(data.load_number)) || String(data.load_number).length <= 2 ) ? null : data.load_number,
           broker_offer:           data.broker_offer,
           extension:            data.extension,
 
           //proposed
           proposed_rate:         data.proposed_rate,
           proposed_rate_minimum: data.proposed_rate_minimum,
+          counter_rate: ((data.proposed_rate - data.proposed_rate_minimum) / 2) + data.proposed_rate_minimum,
 
           //company
           company_name:          company?.name ?? '',
@@ -275,11 +331,13 @@ export const CallForm = () => {
       to_number: company.contact_phone,
       extension: company.number_extension,
       origin: `${origin.city} ${origin.state}`,
-      pickup_date: origin.pickup_date,
+      pickup_date_min: origin.delivery_date_window_start,
+      pickup_date_max: origin.delivery_date_window_end,
       pickup_time_min: toInputTime(origin.pickup_time_window_start),
       pickup_time_max: toInputTime(origin.pickup_time_window_end),
       destination: `${destination.city} ${destination.state}`,
-      delivery_date: destination.delivery_date,
+      delivery_date_min: destination.delivery_date_window_start,
+      delivery_date_max: destination.delivery_date_window_end,
       delivery_time_max: toInputTime(destination.delivery_time_window_start),
       delivery_time_min: toInputTime(destination.delivery_time_window_end),
       weight: Number(load_details.weight_lbs),
@@ -338,6 +396,16 @@ export const CallForm = () => {
                         { ...register('extension') }
                     />
                   </div>
+
+                  {/*<div className="flex flex-col mb-2">
+                    <span>Email</span>
+                    <input
+                        type="email"
+                        className="p-2 border rounded-md bg-gray-200"
+                        autoFocus
+                        { ...register('email') }
+                    />
+                  </div>*/}
 
                   <div className="flex flex-col mb-2">
                     <span>Company</span>
@@ -452,10 +520,10 @@ export const CallForm = () => {
                   </div>
                 </div> 
 
-                <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 my-3">
+                <div className="grid grid-cols-1 gap-2 lg:gap-5 lg:grid-cols-2 my-3">
 
-                  <div className="flex flex-col gap-5 bg-gray-100 rounded-lg shadow-md p-5">
-                    <div className="flex p-2 justify-start">
+                  <div className="flex flex-col gap-5 bg-gray-100 justify-center rounded-lg shadow-md p-5">
+                    <div className="flex justify-start">
                       <h2 className="font-bold">Pick up</h2>
                     </div>
                     <div className="flex flex-col mb-2">
@@ -466,49 +534,68 @@ export const CallForm = () => {
                           { ...register('origin', { required: true }) }
                       />
                     </div>
-                    <div className="flex flex-col mb-2">
-                      <span >Pickup Date</span>
-                      <input
-                          type="date"
-                          className="p-2 border rounded-md bg-gray-200"
-                          { ...register('pickup_date') }
-                      />
+
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="flex flex-col mb-2 w-full">
+                          <span >Pickup Date Min</span>
+                          <input
+                              type="date"
+                              className="p-2 border rounded-md bg-gray-200"
+                              { ...register('pickup_date_min', { required: true }) }
+                          />
+                        </div>
+                        <div className="hidden sm:flex sm:items-center pt-3">to</div>
+                        <div className="flex flex-col mb-2 w-full">
+                          <span >Pickup Date Max</span>
+                          <input
+                              type="date"
+                              className="p-2 border rounded-md bg-gray-200"
+                              { ...register('pickup_date_max', { required: true }) }
+                          />
+                        </div>
                     </div>
 
-                    <div className="flex flex-col mb-2">
-                      <span >Pickup Time Min</span>
-                      <Controller
-                        name="pickup_time_min"
-                        control={control}
-                        render={({ field }) => (
-                          <Time
-                            timeInit={field.value}
-                            onChange={(val) => field.onChange(val)}
-                          />
-                        )}
-                      />
-                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="flex flex-col mb-2 w-full">
+                        <span >Pickup Time Min</span>
+                        <Controller
+                          name="pickup_time_min"
+                          control={control}
+                          rules={{required: true}}
+                          render={({ field }) => (
+                            <Time
+                              timeInit={field.value}
+                              onChange={(val) => field.onChange(val)}
+                            />
+                          )}
+                        />
+                      </div>
 
-                    <div className="flex flex-col mb-2">
-                      <span >Pickup Time Max</span>
-                      <Controller
-                        name="pickup_time_max"
-                        control={control}
-                        render={({ field }) => (
-                          <Time
-                            timeInit={field.value}
-                            onChange={(val) => field.onChange(val)}
-                          />
-                        )}
-                      />
+                      <div className="hidden sm:flex sm:items-center pt-3">to</div>
+
+                      <div className="flex flex-col mb-2 w-full">
+                        <span >Pickup Time Max</span>
+                        <Controller
+                          name="pickup_time_max"
+                          control={control}
+                          rules={{required: true}}
+                          render={({ field }) => (
+                            <Time
+                              timeInit={field.value}
+                              onChange={(val) => field.onChange(val)}
+                            />
+                          )}
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-5 bg-gray-100 rounded-lg shadow-md p-5">
-                    <div className="flex p-2 justify-start">
-                      <h2 className="font-bold">Delivery</h2>
-                    </div>
-                    <div className="flex flex-col mb-2">
+                  <div className="flex flex-col gap-5 bg-gray-100 rounded-lg shadow-md p-5 justify-center">
+                      <div className="flex justify-start">
+                        <h2 className="font-bold">Delivery</h2>
+                      </div>
+                      
+                      <div className="flex flex-col mb-2">
                         <span >Destination</span>
                         <input
                             type="text"
@@ -516,42 +603,61 @@ export const CallForm = () => {
                             { ...register('destination', { required: true }) }
                         />
                       </div>
-                      <div className="flex flex-col mb-2">
-                      <span >Delivery Date</span>
-                      <input
-                          type="date"
-                          className="p-2 border rounded-md bg-gray-200"
-                          { ...register('delivery_date') }
-                      />
-                    </div>
+                      
+                      <div className="flex flex-col sm:flex-row gap-3">
+                          <div className="flex flex-col mb-2 w-full">
+                            <span >Delivery Date Min</span>
+                            <input
+                                type="date"
+                                className="p-2 border rounded-md bg-gray-200"
+                                { ...register('delivery_date_min', { required: true }) }
+                            />
+                          </div>
 
-                    <div className="flex flex-col mb-2">
-                      <span >Delivery Time Min</span>
-                      <Controller
-                        name="delivery_time_min"
-                        control={control}
-                        render={({ field }) => (
-                          <Time
-                            timeInit={field.value}
-                            onChange={(val) => field.onChange(val)}
-                          />
-                        )}
-                      />
-                    </div>
+                          <div className="hidden sm:flex sm:items-center pt-3">to</div>
 
-                    <div className="flex flex-col mb-2">
-                      <span >Delivery Time Max</span>
-                      <Controller
-                        name="delivery_time_max"
-                        control={control}
-                        render={({ field }) => (
-                          <Time
-                            timeInit={field.value}
-                            onChange={(val) => field.onChange(val)}
-                          />
-                        )}
-                      />
-                    </div>
+                          <div className="flex flex-col mb-2 w-full">
+                            <span >Delivery Date Max</span>
+                            <input
+                                type="date"
+                                className="p-2 border rounded-md bg-gray-200"
+                                { ...register('delivery_date_max', { required: true }) }
+                            />
+                          </div>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                          <div className="flex flex-col mb-2 w-full">
+                            <span >Delivery Time Min</span>
+                            <Controller
+                              name="delivery_time_min"
+                              control={control}
+                              rules={{required: true}}
+                              render={({ field }) => (
+                                <Time
+                                  timeInit={field.value}
+                                  onChange={(val) => field.onChange(val)}
+                                />
+                              )}
+                            />
+                          </div>
+
+                          <div className="hidden sm:flex sm:items-center pt-3">to</div>
+
+                          <div className="flex flex-col mb-2 w-full">
+                            <span >Delivery Time Max</span>
+                            <Controller
+                              name="delivery_time_max"
+                              control={control}
+                              rules={{required: true}}
+                              render={({ field }) => (
+                                <Time
+                                  timeInit={field.value}
+                                  onChange={(val) => field.onChange(val)}
+                                />
+                              )}
+                            />
+                          </div>
+                      </div>
                   </div>   
                 
                 </div>
@@ -559,28 +665,26 @@ export const CallForm = () => {
 
               <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
                 <div className="flex flex-col mb-2">
-                  <span>Expected rate</span>
-                  <input
-                      type="text"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('proposed_rate') }
-                  />
-                </div>
-
-
-                <div className="flex flex-col mb-2">
                   <span>Minimum rate</span>
                   <input
-                      type="text"
+                      type="number"
                       className="p-2 border rounded-md bg-gray-200"
                       { ...register('proposed_rate_minimum') }
                   />
                 </div>
+
+                <div className="flex flex-col mb-2">
+                  <span>Expected rate</span>
+                  <input
+                      type="number"
+                      className="p-2 border rounded-md bg-gray-200"
+                      { ...register('proposed_rate') }
+                  />
+                </div>
               </div>
 
-              <div className="flex flex-col mb-2 sm:mt-2">
-                <div className="flex flex-auto">
-                  <button
+              <div className="flex flex-col sm:flex-row gap-3 mb-2 sm:mt-2">
+                <button
                       disabled={ !isValid }
                       type='submit'
                       className={
@@ -592,9 +696,23 @@ export const CallForm = () => {
                               }
                           )
                       }>
-                      Submit
+                      Call
                   </button>
-                </div>
+                  {/*<button
+                      disabled={ !isValid }
+                      type='button'
+                      onClick={ handleSendEmail }
+                      className={
+                          clsx(
+                              "flex w-full sm:w-1/2 justify-center ",
+                              {
+                                  'btn-primary': isValid,
+                                  'btn-disabled': !isValid
+                              }
+                          )
+                      }>
+                      Send email
+                  </button>*/}
               </div>
 
             </form>

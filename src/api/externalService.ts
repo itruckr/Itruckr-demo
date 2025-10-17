@@ -1,4 +1,4 @@
-import { ElevenLabsRequest } from "@/types/app";
+import { ElevenLabsRequest, EmailPayload } from "@/types/app";
 import axios from "axios";
 
 
@@ -29,6 +29,23 @@ export const datExtractorSingleLoad = async (
     const url = `${external}/openai/vision/extractor`;
 
     const { data } = await axios.post(url, { base64 });
+
+    return data;
+  } catch (err: any) {
+    if (err.response?.status === 401) {
+      throw new Error("Invalid user credentials");
+    }
+    throw err;
+  }
+};
+
+export const sendEmailDynamic = async (
+  emailPayload: EmailPayload
+) => {
+  try {
+    const url = `${external}/email/dynamic/send-email`;
+
+    const { data } = await axios.post(url, emailPayload);
 
     return data;
   } catch (err: any) {
