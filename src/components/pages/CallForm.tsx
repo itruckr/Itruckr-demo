@@ -217,6 +217,11 @@ export const CallForm = () => {
     const vehicle = vehicles.find((element) => element.id === Number(data.vehicle));
     const trailer = trailers.find((element) => element.id === Number(data.trailer));
 
+    const proposed_rate = Number(data.proposed_rate);
+    const proposed_rate_minimum = Number(data.proposed_rate_minimum);
+
+    const counter_rate = ((proposed_rate - proposed_rate_minimum) / 2) + proposed_rate_minimum;
+
     const elevenLabsRequest = {
       to_number: data.to_number,
       conversation_initiation_client_data:{
@@ -241,7 +246,7 @@ export const CallForm = () => {
           //proposed
           proposed_rate:         data.proposed_rate,
           proposed_rate_minimum: data.proposed_rate_minimum,
-          counter_rate: (((data.proposed_rate - data.proposed_rate_minimum) / 2) + data.proposed_rate_minimum),
+          counter_rate:           counter_rate,
 
           //company
           company_name:          company?.name ?? '',
