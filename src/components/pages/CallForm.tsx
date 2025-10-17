@@ -241,7 +241,7 @@ export const CallForm = () => {
           //proposed
           proposed_rate:         data.proposed_rate,
           proposed_rate_minimum: data.proposed_rate_minimum,
-          counter_rate: ((data.proposed_rate - data.proposed_rate_minimum) / 2) + data.proposed_rate_minimum,
+          counter_rate: (((data.proposed_rate - data.proposed_rate_minimum) / 2) + data.proposed_rate_minimum),
 
           //company
           company_name:          company?.name ?? '',
