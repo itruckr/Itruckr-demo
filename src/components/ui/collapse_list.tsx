@@ -5,7 +5,7 @@ interface CollapseListProps {
   isOpenInit?: boolean;
   isOpen?: boolean;
   onToggle?: () => void;
-  children?: ReactNode; // contenido opcional
+  children?: ReactNode;
 }
 
 export const CollapseList = ({ title, children, isOpenInit = false, isOpen, onToggle }: CollapseListProps) => {
@@ -55,8 +55,8 @@ export const CollapseList = ({ title, children, isOpenInit = false, isOpen, onTo
         {/* Contenido */}
         <div
           id="collapseContent"
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            open ? "max-h-100 opacity-100" : "max-h-0 opacity-0"
+          className={`transition-all duration-300 ease-in-out p-3 ${
+            open ? "max-h-100 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
           }`}
         >
           { children }

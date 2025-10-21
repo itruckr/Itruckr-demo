@@ -10,6 +10,7 @@ import {
   MessagesSquare
 } from 'lucide-react';
 import React, { createContext, useContext, useState } from 'react';
+import { useAuth } from './AuthContext';
 
 type Page =
   | 'dashboard'
@@ -51,7 +52,9 @@ export function NavigationProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [activePage, setActivePage] = useState<Page>('dashboard');
+  const { currentUser } = useAuth()
+  const pageInit = currentUser?.id === '5' ? 'call-form' : 'dashboard'
+  const [activePage, setActivePage] = useState<Page>(pageInit);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (

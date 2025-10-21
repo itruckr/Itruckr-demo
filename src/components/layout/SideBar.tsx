@@ -183,7 +183,10 @@ export function SideBar() {
         {/* Navigation */}
         <nav className='flex-1' role='navigation' aria-label='Main navigation'>
           <ul className='space-y-2' role='list'>
-            {navItems.map(item => (
+            {navItems.filter(
+              item => currentUser?.id === '5' ? item.id === 'call-form' : true
+            )
+            .map(item => (
               <li key={item.id} role='listitem'>
                 <NavItem item={item} />
               </li>

@@ -4,7 +4,7 @@ interface UploadFileProps {
   label?: string;
   description?: string;
   accept?: string;
-  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void> | void;
+  handleFileChange: (image: File) => Promise<void> | void;
 }
 
 export const UploadFile: React.FC<UploadFileProps> = ({
@@ -15,20 +15,60 @@ export const UploadFile: React.FC<UploadFileProps> = ({
 }: UploadFileProps ) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [loading, setLoading] = useState(false);
+    const [dragActive, setDragActive] = useState(false);
+    
 
     const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files) return;
         setLoading(true); // empieza el loading
         
         try {
-            await handleFileChange(e);
+            const file = e.target.files[0];
+            if (!file) return;
+            await handleFileChange(file);
         } finally {
             setLoading(false); // termina el loading
         }
     };
+
+    const onDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+
+        const file = e.dataTransfer.files[0];
+        if (file) {
+        setLoading(true);
+        try {
+            await handleFileChange(file);
+        } finally {
+            setLoading(false);
+        }
+        }
+    };
+
+    const onDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(true);
+    };
+
+    const onDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+    };
     
     return (
-        <main className="flex items-center justify-center bg-gray-100 font-sans mb-16">
-            <label htmlFor="dropzone-file" className="mx-auto cursor-pointer flex w-full max-w-xl flex-col items-center rounded-xl border-2 border-dashed border-blue-900 bg-white p-6 text-center">
+        <main className="flex items-center justify-center font-sans mb-16">
+            <label 
+                htmlFor="dropzone-file"
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+                className={`mx-auto cursor-pointer flex w-full max-w-xl flex-col items-center rounded-xl border-2 border-dashed ${
+                    dragActive ? "border-blue-600 bg-blue-50" : "border-blue-900 bg-white"
+                } p-6 text-center transition-all duration-200`}>
                 {
                     loading ? (
                         <div className="flex items-center justify-center w-full h-full">

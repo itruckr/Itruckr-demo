@@ -4,14 +4,14 @@ import SucessFull from "../ui/animation/Sucessfull";
 import Headphone from "../ui/animation/Headphone";
 import { useEffect, useState } from "react";
 import { ErrorAnimated } from "../ui/animation/ErrorAnimated";
-import { datExtractorSingleLoad, obtainAuthority, obtainTrailer, outBoundCall, } from "@/api";
+import { datExtractorSingleLoad, obtainAuthority, obtainTrailer, outBoundCall } from "@/api";
 import { Dispatcher, DriverForm as Driver, Vehicule, Trailer, Authority } from '@/types/app';
 import { LoadingScreen } from "../ui/animation/loadingScreen";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { UploadFile } from '../ui/uploadFile';
-import toInputTime from "@/utils/hour_format";
 import { CollapseList } from '../ui/collapse_list';
 import Time from "../ui/timer";
+import { DateRangePickerField } from "../ui/DateRangePickerField";
 
 
 declare global {
@@ -36,14 +36,20 @@ type FormInputs = {
 
   //pickup
   pickup_date: string;
-  pickup_date_min: string;
-  pickup_date_max: string;
+  pickup_range: {
+    startDate: Date;
+    endDate: Date;
+    key: string;
+  };
   pickup_time_min: string;
   pickup_time_max: string;
 
   //delivery
-  delivery_date_min: string;
-  delivery_date_max: string;
+  delivery_range: {
+    startDate: Date;
+    endDate: Date;
+    key: string;
+  };
   delivery_time_min: string;
   delivery_time_max: string;
 
@@ -81,9 +87,9 @@ export const CallForm = () => {
   const [audioUrl, setAudioUrl] = useState<any | null>(null);
   const [isOpenDAT, setisOpenDAT] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
-  const { handleSubmit, register, control, formState: { isValid }, reset } = useForm<FormInputs>({
-        defaultValues: {
-        }
+  const { handleSubmit, register, control, formState: { errors, isValid }, reset, clearErrors } = useForm<FormInputs>({  
+      defaultValues: {
+      }
     });
 
   const allAuthority = async (accessToken: string): Promise<Authority[]> => {
@@ -205,10 +211,57 @@ export const CallForm = () => {
   
   const onSubmit = async ( data: FormInputs ) => {
     if (!isValid) return;
+    
+    // --- VALIDACIÓN 1: rate propuesto ---
     if (data.proposed_rate < data.proposed_rate_minimum) {
       alert(`Proposed rate (${data.proposed_rate}) debe ser mayor o igual al rate mínimo (${data.proposed_rate_minimum})`);
       return;
     }
+
+    // --- VALIDACIÓN 2: fecha de pickup < fecha de delivery ---
+    const pickupMin = new Date(data.pickup_range?.startDate);
+    const pickupMax = new Date(data.pickup_range?.endDate);
+    const deliveryMin = new Date(data.delivery_range?.startDate);
+    const deliveryMax = new Date(data.delivery_range?.endDate);
+
+    if (pickupMin > deliveryMin) {
+      alert(`La fecha mínima de pickup (${pickupMin.toLocaleDateString()}) no puede ser posterior a la fecha mínima de delivery (${deliveryMin.toLocaleDateString()}).`);
+      return;
+    }
+
+    if (pickupMax > deliveryMax) {
+      alert(`La fecha máxima de pickup (${pickupMax.toLocaleDateString()}) no puede ser posterior a la fecha máxima de delivery (${deliveryMax.toLocaleDateString()}).`);
+      return;
+    }
+
+    // --- VALIDACIÓN 3: rango de horas pickup coherente ---
+    const pickupTimeMin = normalizeHour(data.pickup_time_min);
+    const pickupTimeMax = normalizeHour(data.pickup_time_max);
+
+    if (pickupTimeMin && pickupTimeMax && pickupTimeMax < pickupTimeMin) {
+      alert(`La hora máxima de pickup (${pickupTimeMax}) no puede ser menor que la hora mínima (${pickupTimeMin}).`);
+      return;
+    }
+
+    // --- VALIDACIÓN 4: rango de horas delivery coherente ---
+    const deliveryTimeMin = normalizeHour(data.delivery_time_min);
+    const deliveryTimeMax = normalizeHour(data.delivery_time_max);
+
+    if (deliveryTimeMin && deliveryTimeMax && deliveryTimeMax < deliveryTimeMin) {
+      alert(`La hora máxima de delivery (${deliveryTimeMax}) no puede ser menor que la hora mínima (${deliveryTimeMin}).`);
+      return;
+    }
+
+    // --- VALIDACIÓN 5: pickup antes que delivery (si misma fecha) ---
+    if (
+      pickupMax.toISOString().split("T")[0] === deliveryMin.toISOString().split("T")[0] &&
+      pickupTimeMax && deliveryTimeMin &&
+      pickupTimeMax > deliveryTimeMin
+    ) {
+      alert(`La hora de pickup (${pickupTimeMax}) no puede ser posterior a la hora de delivery (${deliveryTimeMin}) si están en la misma fecha.`);
+      return;
+    }
+    
     setLoading('loading_call');
 
     const company = authority.find((element) => element.authorityId === Number(data.company));
@@ -228,12 +281,12 @@ export const CallForm = () => {
         dynamic_variables: {
           origin:                data.origin,
           destination:           data.destination,
-          pickup_date_min:       data.pickup_date_min,
-          pickup_date_max:       data.pickup_date_max,
+          pickup_date_min:       data.pickup_range.startDate.toISOString().split("T")[0] ?? "",
+          pickup_date_max:       data.pickup_range.endDate.toISOString().split("T")[0] ?? "",
           pickup_time_min:       normalizeHour(data.pickup_time_min),
           pickup_time_max:       normalizeHour(data.pickup_time_max),
-          delivery_date_min:     data.delivery_date_min,
-          delivery_date_max:     data.delivery_date_max,
+          delivery_date_min:     data.delivery_range.startDate.toISOString().split("T")[0] ?? "",
+          delivery_date_max:     data.delivery_range.endDate.toISOString().split("T")[0] ?? "",
           delivery_time_min:     normalizeHour(data.delivery_time_min),
           delivery_time_max:     normalizeHour(data.delivery_time_max),
           weight:                String(data.weight),
@@ -267,7 +320,7 @@ export const CallForm = () => {
         }
       }
     }
-
+    
     try {
       await outBoundCall(elevenLabsRequest);  
     } catch (error) {
@@ -297,9 +350,9 @@ export const CallForm = () => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+  const handleFileChange = (image: File): Promise<void> => {
     return new Promise((resolve, reject) => {
-      const file = e.target.files?.[0];
+      const file = image;
       if (!file) {
         resolve(); // nada que hacer
         return;
@@ -340,15 +393,29 @@ export const CallForm = () => {
       to_number: company.contact_phone,
       extension: company.number_extension,
       origin: `${origin.city} ${origin.state}`,
-      pickup_date_min: origin.delivery_date_window_start,
-      pickup_date_max: origin.delivery_date_window_end,
-      pickup_time_min: toInputTime(origin.pickup_time_window_start),
-      pickup_time_max: toInputTime(origin.pickup_time_window_end),
+      pickup_range: {
+        startDate: origin.delivery_date_window_start
+          ? new Date(origin.delivery_date_window_start)
+          : new Date(),
+        endDate: origin.delivery_date_window_end
+          ? new Date(origin.delivery_date_window_end)
+          : new Date(),
+        key: "selection",
+      },
+      //pickup_time_min: toInputTime(origin.pickup_time_window_start),
+      //pickup_time_max: toInputTime(origin.pickup_time_window_end),
       destination: `${destination.city} ${destination.state}`,
-      delivery_date_min: destination.delivery_date_window_start,
-      delivery_date_max: destination.delivery_date_window_end,
-      delivery_time_max: toInputTime(destination.delivery_time_window_start),
-      delivery_time_min: toInputTime(destination.delivery_time_window_end),
+      delivery_range: {
+        startDate: destination.delivery_date_window_start
+          ? new Date(destination.delivery_date_window_start)
+          : new Date(),
+        endDate: destination.delivery_date_window_end
+          ? new Date(destination.delivery_date_window_end)
+          : new Date(),
+        key: "selection",
+      },
+      //delivery_time_max: toInputTime(destination.delivery_time_window_start),
+      //delivery_time_min: toInputTime(destination.delivery_time_window_end),
       weight: Number(load_details.weight_lbs),
       broker_offer: rate,
       load_number: load_details.load_number
@@ -372,7 +439,6 @@ export const CallForm = () => {
     }
   };
 
-
   return (
     <>
       {
@@ -385,45 +451,74 @@ export const CallForm = () => {
             <form onSubmit={ handleSubmit( onSubmit ) } className="grid grid-cols-1 gap-5">
 
               <CollapseList title="General info" isOpenInit={ true } >
-                <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
-                  <div className="flex flex-col mb-2">
-                    <span>Broker phone</span>
+                <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5 p-2">
+                  <div className="flex flex-col mb-2 text-left">
+                    <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.to_number
+                        }
+                      )
+                    }>Broker phone</span>
                     <input
                         type="text"
-                        className="p-2 border rounded-md bg-gray-200"
+                        className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.to_number
+                            }
+                          )
+                        }
                         autoFocus
                         { ...register('to_number', { required: true }) }
                     />
                   </div>
 
-                  <div className="flex flex-col mb-2">
-                    <span>Number ext.</span>
+                  <div className="flex flex-col mb-2 text-left">
+                    <span className="text-sm mb-1">Number ext. (optional)</span>
                     <input
                         type="text"
-                        className="p-2 border rounded-md bg-gray-200"
+                        className="p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm"
                         autoFocus
                         { ...register('extension') }
                     />
                   </div>
 
-                  {/*<div className="flex flex-col mb-2">
-                    <span>Email</span>
+                  {/*<div className="flex flex-col mb-2 text-left">
+                    <span className="text-sm mb-1">Email</span>
                     <input
                         type="email"
-                        className="p-2 border rounded-md bg-gray-200"
+                        className="p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm"
                         autoFocus
                         { ...register('email') }
                     />
                   </div>*/}
 
-                  <div className="flex flex-col mb-2">
-                    <span>Company</span>
+                  <div className="flex flex-col mb-2 text-left">
+                    <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.company
+                        }
+                      )
+                    }>Company</span>
                     <select
-                        className="p-2 border rounded-md bg-gray-200"
+                        className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.company
+                            }
+                          )
+                        }
                         { ...register('company', { required: true }) }
                         onChange={(e) => {
                           const selectedId = e.target.value;
                           handleCompanyChange(selectedId);
+                          if (selectedId) clearErrors("company");
                         }}
                     >
                         <option value="">[ Seleccione ]</option>
@@ -436,10 +531,24 @@ export const CallForm = () => {
                     </select>
                   </div>
             
-                  <div className="flex flex-col mb-2">
-                    <span>Dispatcher</span>
+                  <div className="flex flex-col mb-2 text-left">
+                    <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.dispatcher
+                        }
+                      )
+                    }>Dispatcher</span>
                     <select
-                        className="p-2 border rounded-md bg-gray-200"
+                        className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.dispatcher
+                            }
+                          )
+                        }
                         { ...register('dispatcher', { required: true }) }
                     >
                       <option value="">[ Seleccione ]</option>
@@ -452,10 +561,24 @@ export const CallForm = () => {
                     </select>
                   </div>
 
-                  <div className="flex flex-col mb-2">
-                    <span>Driver</span>
+                  <div className="flex flex-col mb-2 text-left">
+                    <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.driver
+                        }
+                      )
+                    }>Driver</span>
                     <select
-                        className="p-2 border rounded-md bg-gray-200"
+                        className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.driver
+                            }
+                          )
+                        }
                         { ...register('driver', { required: true }) }
                     >
                       <option value="">[ Seleccione ]</option>
@@ -468,10 +591,24 @@ export const CallForm = () => {
                     </select>
                   </div>
 
-                  <div className="flex flex-col mb-2">
-                    <span>Vehicle</span>
+                  <div className="flex flex-col mb-2 text-left">
+                    <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.vehicle
+                        }
+                      )
+                    }>Vehicle</span>
                     <select
-                        className="p-2 border rounded-md bg-gray-200"
+                        className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.vehicle
+                            }
+                          )
+                        }
                         { ...register('vehicle', { required: true }) }
                     >
                         <option value="">[ Seleccione ]</option>
@@ -483,10 +620,24 @@ export const CallForm = () => {
                     </select>
                   </div>
 
-                  <div className="flex flex-col mb-2">
-                    <span>Trailer</span>
+                  <div className="flex flex-col mb-2 text-left">
+                    <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.trailer
+                        }
+                      )
+                    }>Trailer</span>
                     <select
-                        className="p-2 border rounded-md bg-gray-200"
+                        className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.trailer
+                            }
+                          )
+                        }
                         { ...register('trailer', { required: true }) }
                     >
                         <option value="">[ Seleccione ]</option>
@@ -501,29 +652,71 @@ export const CallForm = () => {
               </CollapseList>
 
               <CollapseList title="Load info" isOpen={ isOpenDAT } onToggle={ () => setisOpenDAT(!isOpenDAT) } >
-                <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
-                  <div className="flex flex-col mb-2">
-                    <span >Load Number</span>
+                <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5 p-2">
+                  <div className="flex flex-col mb-2 text-left">
+                    <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.load_number
+                        }
+                      )
+                    }>Load Number (optional)</span>
                     <input
                         type="text"
-                        className="p-2 border rounded-md bg-gray-200"
+                        className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.load_number
+                            }
+                          )
+                        }
                         { ...register('load_number') }
                     />
                   </div>
-                  <div className="flex flex-col mb-2">
-                    <span >Weight</span>
+                  <div className="flex flex-col mb-2 text-left">
+                    <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.weight
+                        }
+                      )
+                    }>Weight</span>
                     <input
                         type="text"
-                        className="p-2 border rounded-md bg-gray-200"
+                        className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.weight
+                            }
+                          )
+                        }
                         { ...register('weight', { required: true }) }
                     />
                   </div>
 
-                  <div className="flex flex-col mb-2">
-                    <span >Offer</span>
+                  <div className="flex flex-col mb-2 text-left">
+                    <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.broker_offer
+                        }
+                      )
+                    }>Offer</span>
                     <input
                         type="text"
-                        className="p-2 border rounded-md bg-gray-200"
+                        className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.broker_offer
+                            }
+                          )
+                        }
                         { ...register('broker_offer', { required: true }) }
                     />
                   </div>
@@ -535,38 +728,48 @@ export const CallForm = () => {
                     <div className="flex justify-start">
                       <h2 className="font-bold">Pick up</h2>
                     </div>
-                    <div className="flex flex-col mb-2">
-                      <span >Origin</span>
+                    <div className="flex flex-col mb-2 text-left">
+                      <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.origin
+                        }
+                      )
+                    }>Origin</span>
                       <input
                           type="text"
-                          className="p-2 border rounded-md bg-gray-200"
+                          className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.origin
+                            }
+                          )
+                        }
                           { ...register('origin', { required: true }) }
                       />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3">
-                        <div className="flex flex-col mb-2 w-full">
-                          <span >Pickup Date Min</span>
-                          <input
-                              type="date"
-                              className="p-2 border rounded-md bg-gray-200"
-                              { ...register('pickup_date_min', { required: true }) }
-                          />
-                        </div>
-                        <div className="hidden sm:flex sm:items-center pt-3">to</div>
-                        <div className="flex flex-col mb-2 w-full">
-                          <span >Pickup Date Max</span>
-                          <input
-                              type="date"
-                              className="p-2 border rounded-md bg-gray-200"
-                              { ...register('pickup_date_max', { required: true }) }
-                          />
-                        </div>
+                      <DateRangePickerField
+                        control={control}
+                        name="pickup_range"
+                        label="Pickup Date (Min → Max)"
+                        error={ errors.pickup_range }
+                      />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3">
-                      <div className="flex flex-col mb-2 w-full">
-                        <span >Pickup Time Min</span>
+                      <div className="flex flex-col mb-2 text-left w-full">
+                        <span className={
+                          clsx(
+                            "text-sm mb-1",
+                            {
+                              "text-red-600": errors.pickup_time_min
+                            }
+                          )
+                        }>Pickup Time Min</span>
                         <Controller
                           name="pickup_time_min"
                           control={control}
@@ -575,6 +778,7 @@ export const CallForm = () => {
                             <Time
                               timeInit={field.value}
                               onChange={(val) => field.onChange(val)}
+                              error={ errors.pickup_time_min }
                             />
                           )}
                         />
@@ -582,8 +786,15 @@ export const CallForm = () => {
 
                       <div className="hidden sm:flex sm:items-center pt-3">to</div>
 
-                      <div className="flex flex-col mb-2 w-full">
-                        <span >Pickup Time Max</span>
+                      <div className="flex flex-col mb-2 text-left w-full">
+                        <span className={
+                          clsx(
+                            "text-sm mb-1",
+                            {
+                              "text-red-600": errors.pickup_time_max
+                            }
+                          )
+                        }>Pickup Time Max</span>
                         <Controller
                           name="pickup_time_max"
                           control={control}
@@ -592,6 +803,7 @@ export const CallForm = () => {
                             <Time
                               timeInit={field.value}
                               onChange={(val) => field.onChange(val)}
+                              error={ errors.pickup_time_max }
                             />
                           )}
                         />
@@ -604,39 +816,47 @@ export const CallForm = () => {
                         <h2 className="font-bold">Delivery</h2>
                       </div>
                       
-                      <div className="flex flex-col mb-2">
-                        <span >Destination</span>
+                      <div className="flex flex-col mb-2 text-left">
+                        <span className={
+                          clsx(
+                            "text-sm mb-1",
+                            {
+                              "text-red-600": errors.destination
+                            }
+                          )
+                        }>Destination</span>
                         <input
                             type="text"
-                            className="p-2 border rounded-md  bg-gray-200"
+                            className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.destination
+                            }
+                          )
+                        }
                             { ...register('destination', { required: true }) }
                         />
                       </div>
                       
                       <div className="flex flex-col sm:flex-row gap-3">
-                          <div className="flex flex-col mb-2 w-full">
-                            <span >Delivery Date Min</span>
-                            <input
-                                type="date"
-                                className="p-2 border rounded-md bg-gray-200"
-                                { ...register('delivery_date_min', { required: true }) }
-                            />
-                          </div>
-
-                          <div className="hidden sm:flex sm:items-center pt-3">to</div>
-
-                          <div className="flex flex-col mb-2 w-full">
-                            <span >Delivery Date Max</span>
-                            <input
-                                type="date"
-                                className="p-2 border rounded-md bg-gray-200"
-                                { ...register('delivery_date_max', { required: true }) }
-                            />
-                          </div>
+                           <DateRangePickerField
+                            control={control}
+                            name="delivery_range"
+                            label="Delivery Date (Min → Max)"
+                            error={ errors.delivery_range }
+                          />
                       </div>
                       <div className="flex flex-col sm:flex-row gap-3">
-                          <div className="flex flex-col mb-2 w-full">
-                            <span >Delivery Time Min</span>
+                          <div className="flex flex-col mb-2 text-left w-full">
+                            <span className={
+                              clsx(
+                                "text-sm mb-1",
+                                {
+                                  "text-red-600": errors.delivery_time_min
+                                }
+                              )
+                            }>Delivery Time Min</span>
                             <Controller
                               name="delivery_time_min"
                               control={control}
@@ -645,6 +865,7 @@ export const CallForm = () => {
                                 <Time
                                   timeInit={field.value}
                                   onChange={(val) => field.onChange(val)}
+                                  error={ errors.delivery_time_min }
                                 />
                               )}
                             />
@@ -652,8 +873,15 @@ export const CallForm = () => {
 
                           <div className="hidden sm:flex sm:items-center pt-3">to</div>
 
-                          <div className="flex flex-col mb-2 w-full">
-                            <span >Delivery Time Max</span>
+                          <div className="flex flex-col mb-2 text-left w-full">
+                            <span className={
+                              clsx(
+                                "text-sm mb-1",
+                                {
+                                  "text-red-600": errors.delivery_time_max
+                                }
+                              )
+                            }>Delivery Time Max</span>
                             <Controller
                               name="delivery_time_max"
                               control={control}
@@ -662,6 +890,7 @@ export const CallForm = () => {
                                 <Time
                                   timeInit={field.value}
                                   onChange={(val) => field.onChange(val)}
+                                  error={ errors.delivery_time_max }
                                 />
                               )}
                             />
@@ -673,38 +902,57 @@ export const CallForm = () => {
               </CollapseList>
 
               <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5">
-                <div className="flex flex-col mb-2">
-                  <span>Minimum rate</span>
+                <div className="flex flex-col mb-2 text-left">
+                  <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.proposed_rate_minimum
+                        }
+                      )
+                    }>Minimum rate</span>
                   <input
                       type="number"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('proposed_rate_minimum') }
+                      className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.proposed_rate_minimum
+                            }
+                          )
+                        }
+                      { ...register('proposed_rate_minimum', {required: true}) }
                   />
                 </div>
 
-                <div className="flex flex-col mb-2">
-                  <span>Expected rate</span>
+                <div className="flex flex-col mb-2 text-left">
+                  <span className={
+                      clsx(
+                        "text-sm mb-1",
+                        {
+                          "text-red-600": errors.proposed_rate
+                        }
+                      )
+                    }>Expected rate</span>
                   <input
                       type="number"
-                      className="p-2 border rounded-md bg-gray-200"
-                      { ...register('proposed_rate') }
+                      className={
+                          clsx(
+                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
+                            {
+                              "border border-red-600": errors.proposed_rate
+                            }
+                          )
+                        }
+                      { ...register('proposed_rate', {required: true}) }
                   />
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-2 sm:mt-2">
                 <button
-                      disabled={ !isValid }
                       type='submit'
-                      className={
-                          clsx(
-                              "flex w-full sm:w-1/2 justify-center ",
-                              {
-                                  'btn-primary': isValid,
-                                  'btn-disabled': !isValid
-                              }
-                          )
-                      }>
+                      className="flex w-full sm:w-1/2 justify-center btn-primary">
                       Call
                   </button>
                   {/*<button

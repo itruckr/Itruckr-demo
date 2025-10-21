@@ -53,6 +53,16 @@ export const dummyUsers: User[] = [
     profilePicture: '/pp.jpg',
     initials: 'MD',
   },
+  {
+    id: '5',
+    name: 'Dispatcher',
+    username: 'dispatch',
+    role: 'Dispatcher',
+    email: 'dsp.moises@itruckr.com',
+    password: '12345678',
+    profilePicture: '/pp.jpg',
+    initials: 'DP',
+  },
 ];
 
 interface AuthContextType {
