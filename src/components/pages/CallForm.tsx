@@ -238,7 +238,7 @@ export const CallForm = () => {
     const pickupTimeMin = normalizeHour(data.pickup_time_min);
     const pickupTimeMax = normalizeHour(data.pickup_time_max);
 
-    if (pickupTimeMin && pickupTimeMax && pickupTimeMax < pickupTimeMin) {
+    if (pickupTimeMin && pickupTimeMax && pickupMin === pickupMax && pickupTimeMax < pickupTimeMin) {
       alert(`La hora máxima de pickup (${pickupTimeMax}) no puede ser menor que la hora mínima (${pickupTimeMin}).`);
       return;
     }
@@ -247,18 +247,8 @@ export const CallForm = () => {
     const deliveryTimeMin = normalizeHour(data.delivery_time_min);
     const deliveryTimeMax = normalizeHour(data.delivery_time_max);
 
-    if (deliveryTimeMin && deliveryTimeMax && deliveryTimeMax < deliveryTimeMin) {
+    if (deliveryTimeMin && deliveryTimeMax && deliveryMin === deliveryMax && deliveryTimeMax < deliveryTimeMin) {
       alert(`La hora máxima de delivery (${deliveryTimeMax}) no puede ser menor que la hora mínima (${deliveryTimeMin}).`);
-      return;
-    }
-
-    // --- VALIDACIÓN 5: pickup antes que delivery (si misma fecha) ---
-    if (
-      pickupMax.toISOString().split("T")[0] === deliveryMin.toISOString().split("T")[0] &&
-      pickupTimeMax && deliveryTimeMin &&
-      pickupTimeMax > deliveryTimeMin
-    ) {
-      alert(`La hora de pickup (${pickupTimeMax}) no puede ser posterior a la hora de delivery (${deliveryTimeMin}) si están en la misma fecha.`);
       return;
     }
     
