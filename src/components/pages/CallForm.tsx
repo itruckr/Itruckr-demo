@@ -418,7 +418,7 @@ export const CallForm = () => {
       //delivery_time_min: toInputTime(destination.delivery_time_window_end),
       weight: Number(load_details.weight_lbs),
       broker_offer: rate,
-      load_number: load_details.load_number
+      load_number: load_details.reference_id
     });
 
     setisOpenDAT(true);
