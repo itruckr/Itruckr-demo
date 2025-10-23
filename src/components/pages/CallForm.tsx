@@ -4,8 +4,8 @@ import SucessFull from "../ui/animation/Sucessfull";
 import Headphone from "../ui/animation/Headphone";
 import { useEffect, useState } from "react";
 import { ErrorAnimated } from "../ui/animation/ErrorAnimated";
-import { datExtractorSingleLoad, obtainAuthority, obtainTrailer, outBoundCall } from "@/api";
-import { Dispatcher, DriverForm as Driver, Vehicule, Trailer, Authority } from '@/types/app';
+import { datExtractorSingleLoad, obtainAuthority, obtainTrailer, outBoundCall, sendEmailDynamic } from "@/api";
+import { Dispatcher, DriverForm as Driver, Vehicule, Trailer, Authority, EmailPayload } from '@/types/app';
 import { LoadingScreen } from "../ui/animation/loadingScreen";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { UploadFile } from '../ui/uploadFile';
@@ -32,7 +32,7 @@ type FormInputs = {
   load_number: string;
   to_number: string;
  
-  //email: string,
+  email: string,
 
   //pickup
   pickup_date: string;
@@ -87,7 +87,7 @@ export const CallForm = () => {
   const [audioUrl, setAudioUrl] = useState<any | null>(null);
   const [isOpenDAT, setisOpenDAT] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
-  const { handleSubmit, register, control, formState: { errors, isValid }, reset, clearErrors } = useForm<FormInputs>({  
+  const { handleSubmit, register, control, formState: { errors, isValid }, watch, reset, clearErrors } = useForm<FormInputs>({  
       defaultValues: {
       }
     });
@@ -169,8 +169,10 @@ export const CallForm = () => {
   }, [messages]);
 
   //region email
-  /*const email = watch("email");
-  const company = watch("company");
+  const BrokerEmail = watch("email");
+  const companyId = watch("company");
+  const origin = watch("origin");
+  const destination= watch("destination");
 
   const handleSendEmail = async () => {
     if (!isValid) {
@@ -178,35 +180,89 @@ export const CallForm = () => {
       return;
     }
 
-    if (!email) {
+    if (!BrokerEmail) {
       alert("Debe ingresar un correo electrónico para enviar el email");
       return;
     }
 
-    if (company !== "3") {
-      alert("Solo se permite enviar correos si la empresa es 'MOLA S TRANSPORT'");
-      return;
-    }
+    const company = authority.find((element) => element.authorityId === Number(companyId));
 
+    let pass: string;
+
+    switch (companyId) { 
+      case '1':
+        pass = 'bepeneceyzxlyexl';
+        break;
+      case '2':
+        pass = 'vaknztdauyoskeey';
+        break;
+      case '3':
+        pass = 'idlpmgwhbokctrfy';
+        break;
+      case '4':
+        pass = '';
+        break;
+      case '5':
+        pass = '';
+        break;
+      default:
+        pass = 'Unknown company';
+    }
+  
+    const htmlBody = `
+  <div style="
+    font-family: Arial, Helvetica, sans-serif;
+    color: #333;
+    line-height: 1.6;
+    font-size: 15px;
+  ">
+    <p>Hi!</p>
+
+    <p>
+      Our <strong>MC</strong> is <b>${company?.mcNumber}</b>.<br>
+      Please let me know the details for this load, including:
+    </p>
+
+    <ul style="margin-top: 8px; margin-bottom: 16px;">
+      <li><b>PU APPT</b></li>
+      <li><b>DEL APPT</b></li>
+      <li><b>COMMODITY</b></li>
+      <li><b>RATE</b></li>
+    </ul>
+
+    <p>I’ll be waiting for your response.</p>
+
+    <p style="margin-top: 24px;">
+      Thanks,<br>
+      <strong>David Perez</strong><br>
+      <span style="color: #555;">Fleet Dispatcher</span><br>
+      <a href="tel:+17542311155" style="color: #007bff; text-decoration: none;">(754) 231-1155</a>
+    </p>
+  </div>
+`;
 
     const data: EmailPayload = {
       requestEmail: {
-        to: email,
+        to: BrokerEmail,
         cc: null,
         bbc: null,
-        subject: "esto es una prueba",
-        text: "hola que mas ???????????",
+        subject: `We have a Driver for your Load from ${origin} to ${destination}`,
+        text: htmlBody,
         attachments: [],
       },
-      username: "molastransport@gmail.com",
-      password: "idlpmgwhbokctrfy",
-      personal: "test Email",
+      username: company!.email,
+      password: pass,
+      personal: "Load Info Request",
     };
-
-    await sendEmailDynamic(data);
-    // Aquí tu lógica para enviar el correo
-    alert("Correo enviado correctamente ✅");
-  };*/
+    
+    try {
+     await sendEmailDynamic(data);
+      // Aquí tu lógica para enviar el correo
+      alert("Correo enviado correctamente ✅"); 
+    } catch (error) {
+      alert("Error al enviar Correo ❌"); 
+    }
+  };
   //endregion email
   
   const onSubmit = async ( data: FormInputs ) => {
@@ -382,6 +438,7 @@ export const CallForm = () => {
     reset({
       to_number: company.contact_phone,
       extension: company.number_extension,
+      email: company.email,
       origin: `${origin.city} ${origin.state}`,
       pickup_range: {
         startDate: origin.delivery_date_window_start
@@ -476,15 +533,15 @@ export const CallForm = () => {
                     />
                   </div>
 
-                  {/*<div className="flex flex-col mb-2 text-left">
-                    <span className="text-sm mb-1">Email</span>
+                  <div className="flex flex-col mb-2 text-left">
+                    <span className="text-sm mb-1">Email (optional)</span>
                     <input
                         type="email"
                         className="p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm"
                         autoFocus
                         { ...register('email') }
                     />
-                  </div>*/}
+                  </div>
 
                   <div className="flex flex-col mb-2 text-left">
                     <span className={
@@ -644,24 +701,10 @@ export const CallForm = () => {
               <CollapseList title="Load info" isOpen={ isOpenDAT } onToggle={ () => setisOpenDAT(!isOpenDAT) } >
                 <div className="grid grid-cols-1 gap-2 sm:gap-5 sm:grid-cols-2 mt-5 p-2">
                   <div className="flex flex-col mb-2 text-left">
-                    <span className={
-                      clsx(
-                        "text-sm mb-1",
-                        {
-                          "text-red-600": errors.load_number
-                        }
-                      )
-                    }>Load Number (optional)</span>
+                    <span className="text-sm mb-1">Load Number (optional)</span>
                     <input
                         type="text"
-                        className={
-                          clsx(
-                            "p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm",
-                            {
-                              "border border-red-600": errors.load_number
-                            }
-                          )
-                        }
+                        className="p-2 border border-gray-200 rounded-lg bg-gray-100 show-sm"
                         { ...register('load_number') }
                     />
                   </div>
@@ -945,7 +988,7 @@ export const CallForm = () => {
                       className="flex w-full sm:w-1/2 justify-center btn-primary">
                       Call
                   </button>
-                  {/*<button
+                  <button
                       disabled={ !isValid }
                       type='button'
                       onClick={ handleSendEmail }
@@ -959,7 +1002,7 @@ export const CallForm = () => {
                           )
                       }>
                       Send email
-                  </button>*/}
+                  </button>
               </div>
 
             </form>
