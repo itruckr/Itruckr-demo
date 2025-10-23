@@ -257,7 +257,7 @@ export const CallForm = () => {
     <p style="margin-top: 24px;">
       Thanks,<br>
       <strong>${company?.name}</strong><br>
-      <strong>MC</strong><b>${company?.mcNumber}</b>.<br>
+      <strong>MC${' '}</strong><b>${company?.mcNumber}</b>.<br>
     </p>
   </div>
 `;
