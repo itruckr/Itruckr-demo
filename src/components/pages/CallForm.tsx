@@ -173,6 +173,28 @@ export const CallForm = () => {
   const companyId = watch("company");
   const origin = watch("origin");
   const destination= watch("destination");
+  const pickupStartDate = watch("pickup_range.startDate");
+
+  const normalizeDate = (date: Date): string => {
+    const pickupStartDate = date;
+
+    const day = pickupStartDate.getDate();
+    const month = pickupStartDate.toLocaleString('en-US', { month: 'short' }).toUpperCase(); // OCT
+
+    // Agregar sufijo: st, nd, rd, th
+    const getDaySuffix = (day: number) => {
+          if (day > 3 && day < 21) return 'th';
+          switch (day % 10) {
+            case 1: return 'st';
+            case 2: return 'nd';
+            case 3: return 'rd';
+            default: return 'th';
+          }
+    };
+
+    const formatted = `${month} ${day}${getDaySuffix(day)}`;
+    return formatted;
+  }
 
   const handleSendEmail = async () => {
     if (!isValid) {
@@ -234,9 +256,8 @@ export const CallForm = () => {
 
     <p style="margin-top: 24px;">
       Thanks,<br>
-      <strong>David Perez</strong><br>
-      <span style="color: #555;">Fleet Dispatcher</span><br>
-      <a href="tel:+17542311155" style="color: #007bff; text-decoration: none;">(754) 231-1155</a>
+      <strong>${company?.name}</strong><br>
+      <strong>MC</strong><b>${company?.mcNumber}</b>.<br>
     </p>
   </div>
 `;
@@ -246,7 +267,7 @@ export const CallForm = () => {
         to: BrokerEmail,
         cc: null,
         bbc: null,
-        subject: `We have a Driver for your Load from ${origin} to ${destination}`,
+        subject: `We have a Driver for your Load from ${origin} to ${destination} on ${normalizeDate(pickupStartDate)}`,
         text: htmlBody,
         attachments: [],
       },
