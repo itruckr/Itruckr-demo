@@ -364,14 +364,14 @@ Here are the details of booked load:
 ### ⬆️ Pickup Details
 | Parameter | Value |
 |---|---|
-| **Pickup Date** | 08/13/2025 |
+| **Pickup Date** | 11/10/2025 |
 | **Pickup Window** | 08:00 - 15:00 |
 | **Address** | Chicago, IL, 26836 |
 
 ### ⬇️ Delivery Details
 | Parameter | Value |
 |---|---|
-| **Delivery Date** | 08/15/2025 |
+| **Delivery Date** | 11/11/2025 |
 | **Delivery Window** | 08:00 - 15:00 |
 | **Address** | Atlanta, GA, 30316 |`,
 } as ChatMessage;
